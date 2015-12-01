@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import com.gracenote.gnsdk.*;
 
 import java.io.IOException;
@@ -38,6 +39,10 @@ public class MainActivity extends AppCompatActivity{
     private List<GnMusicIdFile>			fileIdObjects			= new ArrayList<GnMusicIdFile>();
     private List<GnMusicIdStream>		streamIdObjects			= new ArrayList<GnMusicIdStream>();
 
+    private TextView artistTv;
+    private TextView albumTv;
+    private TextView trackTv;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +50,9 @@ public class MainActivity extends AppCompatActivity{
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        artistTv = (TextView)findViewById(R.id.artist);
+        albumTv = (TextView)findViewById(R.id.album);
+        trackTv = (TextView)findViewById(R.id.track);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -166,7 +174,7 @@ public class MainActivity extends AppCompatActivity{
 
             } catch (GnException e) {
 
-                Log.e( appString, e.errorCode() + ", " + e.errorDescription() + ", " + e.errorModule() );
+                Log.e(appString, e.errorCode() + ", " + e.errorDescription() + ", " + e.errorModule());
             }
         }
     }
@@ -420,12 +428,12 @@ public class MainActivity extends AppCompatActivity{
                     GnAlbumIterator iter = albumsResult.albums().getIterator();
                     while (iter.hasNext()) {
                         GnAlbum album = iter.next();
-                        Log.d(appString, "Album: "+album.title().display());
+                        albumTv.setText("Album: "+album.title().display());
 
                         if ( album.trackMatched() != null ) {
                             GnArtist artist = album.artist();
-                            Log.d(appString, "Artist: " + artist.name().display());
-                            Log.d(appString, "Title: " + album.trackMatched().title().display());
+                            artistTv.setText("Artist: " + artist.name().display());
+                            trackTv.setText("Title: " + album.trackMatched().title().display());
                         }
 
                     }

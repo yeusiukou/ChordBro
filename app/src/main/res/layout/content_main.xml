@@ -14,23 +14,30 @@
         tools:context=".MainActivity">
 
     <TextView
-            android:id="@+id/statusField"
+            android:id="@+id/artist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="false"
             android:layout_marginTop="17dp"
-            android:text="Operation Status"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <TextView
-            android:id="@+id/matchResultField"
+            android:id="@+id/album"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/statusField"
-            android:layout_below="@+id/statusField"
+            android:layout_alignLeft="@+id/artist"
+            android:layout_below="@+id/artist"
             android:layout_marginTop="118dp"
-            android:text="Match Result"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+            android:id="@+id/track"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/album"
+            android:layout_below="@+id/album"
+            android:layout_marginTop="118dp"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
 </RelativeLayout>
