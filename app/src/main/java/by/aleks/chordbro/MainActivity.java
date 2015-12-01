@@ -134,6 +134,44 @@ public class MainActivity extends AppCompatActivity{
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        if ( gnMusicIdStream != null ) {
+
+            // Create a thread to process the data pulled from GnMic
+            // Internally pulling data is a blocking call, repeatedly called until
+            // audio processing is stopped. This cannot be called on the main thread.
+            Thread audioProcessThread = new Thread(new AudioProcessRunnable());
+            audioProcessThread.start();
+
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if ( gnMusicIdStream != null ) {
+
+            try {
+                // to ensure no pending identifications deliver results while your app is
+                // paused it is good practice to call cancel
+                // it is safe to call identifyCancel if no identify is pending
+                gnMusicIdStream.identifyCancel();
+
+                // stopping audio processing stops the audio processing thread started
+                // in onResume
+                gnMusicIdStream.audioProcessStop();
+
+            } catch (GnException e) {
+
+                Log.e( appString, e.errorCode() + ", " + e.errorDescription() + ", " + e.errorModule() );
+            }
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -276,6 +314,26 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
+
+    /**
+     * GnMusicIdStream object processes audio read directly from GnMic object
+     */
+    class AudioProcessRunnable implements Runnable {
+
+        @Override
+        public void run() {
+            try {
+
+                // start audio processing with GnMic, GnMusicIdStream pulls data from GnMic internally
+                gnMusicIdStream.audioProcessStart(gnMicrophone);
+
+            } catch (GnException e) {
+
+                Log.e( appString, e.errorCode() + ", " + e.errorDescription() + ", " + e.errorModule() );
+            }
+        }
+    }
+
     /**
      * GNSDK bundle ingest status event delegate
      */
@@ -365,7 +423,7 @@ public class MainActivity extends AppCompatActivity{
                         Log.d(appString, "Album: "+album.title().display());
 
                         if ( album.trackMatched() != null ) {
-                            GnArtist artist = album.trackMatched().artist();
+                            GnArtist artist = album.artist();
                             Log.d(appString, "Artist: " + artist.name().display());
                             Log.d(appString, "Title: " + album.trackMatched().title().display());
                         }
