@@ -1,5 +1,6 @@
 package by.aleks.chordbro;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -48,6 +49,8 @@ public class MainActivity extends AppCompatActivity{
                 new Thread(recognizer).start();
             }
         });
+
+        startActivity(new Intent().setClassName(this, "by.aleks.chordbro.SongActivity"));
 
     }
 
