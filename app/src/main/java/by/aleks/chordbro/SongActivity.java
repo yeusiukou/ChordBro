@@ -1,5 +1,8 @@
 package by.aleks.chordbro;
 
+import android.content.Context;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -11,6 +14,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -58,8 +62,43 @@ public class SongActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(Spanned spanned) {
                 songTV.setText(spanned);
+                adjustTextSize(songTV);
             }
         }.execute();
+    }
+
+    private void adjustTextSize(TextView textView){
+
+        //Find the longest line
+        String[] lines = textView.getText().toString().split("\n");
+        String longestLine = "";
+        for(String line:lines){
+            if(line.length()>longestLine.length())
+                longestLine = line;
+        }
+
+        //Adjust the font size to fit the longest line
+        Rect bounds = new Rect();
+        int width = 0;
+        while(true){
+            Paint textPaint = textView.getPaint();
+            textPaint.getTextBounds(longestLine,0,longestLine.length(),bounds);
+            width = bounds.width();
+
+            ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) textView.getLayoutParams();
+            float indents = textView.getTotalPaddingLeft() + textView.getTotalPaddingRight() + lp.leftMargin + lp.rightMargin;
+            //0.8 is a value I found experimentally.
+            if(textView.getWidth()*0.8 - indents > width){
+                textView.setTextSize(pixelsToSp(textView.getTextSize())+0.3f);
+                Log.d("adjustTS", "tv: "+textView.getWidth()+"width: "+width+", size:"+textView.getTextSize());
+            }
+            else break;
+        }
+    }
+
+    private float pixelsToSp(float px) {
+        float scaledDensity = getResources().getDisplayMetrics().scaledDensity;
+        return px/scaledDensity;
     }
 
 
