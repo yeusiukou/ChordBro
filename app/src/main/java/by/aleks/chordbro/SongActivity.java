@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -40,15 +41,25 @@ public class SongActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(
+                R.id.toolbar_layout);
+        collapsingToolbar.setTitleEnabled(false);
 
         final TextView songTV = (TextView)findViewById(R.id.song_text);
 
         final String artist = "Muse";
         final String title = "Uprising";
-        setTitle(artist + " - " + title);
+
+        getSupportActionBar().setTitle(artist + " - " + title);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
         ImageView artistImage = (ImageView)findViewById(R.id.artist_image);
         artistImage.setImageResource(R.drawable.muse);
+
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.addTab(tabLayout.newTab().setText("Chords"));
+        tabLayout.addTab(tabLayout.newTab().setText("Tabs"));
 
         new AsyncTask<Void, Void, Spanned>() {
             @Override
