@@ -1,10 +1,13 @@
 package by.aleks.chordbro;
 
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +52,7 @@ public class SongFragment extends Fragment {
             text = getArguments().getString(TEXT_PARAM);
             TextView songTV = (TextView)view.findViewById(R.id.song_text);
             songTV.setText(styleString(text));
+            adjustTextSize(songTV);
         }
         return view;
     }
@@ -56,5 +60,39 @@ public class SongFragment extends Fragment {
     private Spanned styleString(String songText){
         String styled = songText.replace("<span class=\"line_end\"></span>", "<br>").replace(" ", "&nbsp;&nbsp;").replace("[ch]", "<font color=\"blue\">").replace("[/ch]", "</font>");
         return Html.fromHtml(styled);
+    }
+
+    private void adjustTextSize(TextView textView){
+
+        //Find the longest line
+        String[] lines = textView.getText().toString().split("\n");
+        String longestLine = "";
+        for(String line:lines){
+            if(line.length()>longestLine.length())
+                longestLine = line;
+        }
+
+        //Adjust the font size to fit the longest line
+        Rect bounds = new Rect();
+        int width = 0;
+        while(true){
+            Paint textPaint = textView.getPaint();
+            textPaint.getTextBounds(longestLine,0,longestLine.length(),bounds);
+            width = bounds.width();
+
+            ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) textView.getLayoutParams();
+            float indents = textView.getTotalPaddingLeft() + textView.getTotalPaddingRight() + lp.leftMargin + lp.rightMargin;
+            //0.7 is a value I found experimentally.
+            if(textView.getWidth()*0.7 - indents > width){
+                textView.setTextSize(pixelsToSp(textView.getTextSize())+0.3f);
+                Log.d("adjustTS", "tv: " + textView.getWidth() + "width: " + width + ", size:" + textView.getTextSize());
+            }
+            else break;
+        }
+    }
+
+    private float pixelsToSp(float px) {
+        float scaledDensity = getView().getResources().getDisplayMetrics().scaledDensity;
+        return px/scaledDensity;
     }
 }

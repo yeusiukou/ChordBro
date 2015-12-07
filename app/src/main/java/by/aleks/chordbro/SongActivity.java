@@ -8,7 +8,6 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Spanned;
 import android.view.View;
 import android.widget.ImageView;
 import java.util.Map;
@@ -38,7 +37,7 @@ public class SongActivity extends AppCompatActivity {
 
         final TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
 
-        new SongContentLoader(this){
+        new SongContentLoader(){
 
             @Override
             protected void onPostExecute(final Map<String, String> map) {
