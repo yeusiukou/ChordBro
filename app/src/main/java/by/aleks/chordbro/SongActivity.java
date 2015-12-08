@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
 import java.util.Map;
+import java.util.Set;
 
 public class SongActivity extends AppCompatActivity {
 
@@ -37,24 +39,63 @@ public class SongActivity extends AppCompatActivity {
 
         final TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
 
+        // Load and display content
         new SongContentLoader(){
 
+            private final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+            private final FragmentManager fm = getSupportFragmentManager();
+
+            /**
+             * To reduce the waiting time we don't wait until the all content is loaded.
+             * While the first fragment is being showed we load other possible fragments.
+             */
+            @Override
+            public void onFirstResultLoaded(final String loadedType, final String firstLoadedContent, final Set<String> allContentTypes) {
+                SongActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        // If only one type of content was found, hide the tab layout
+                        if(allContentTypes.size()<2){
+                            tabLayout.setVisibility(View.GONE);
+                            return;
+                        }
+
+                        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+
+                        // Add the preferred tab first
+                        tabLayout.addTab(tabLayout.newTab().setText(loadedType));
+                        allContentTypes.remove(loadedType);
+
+                        for(String type : allContentTypes){
+                            // Create tabs with names of content type
+                            tabLayout.addTab(tabLayout.newTab().setText(type));
+                        }
+
+                        // Temporary adapter while we don't have the
+                        viewPager.setAdapter(new FragmentStatePagerAdapter(fm) {
+                            @Override
+                            public Fragment getItem(int position) {
+                                return SongFragment.newInstance(firstLoadedContent);
+                            }
+
+                            @Override
+                            public int getCount() {
+                                return 1;
+                            }
+                        });
+                    }
+                });
+            }
+
+            /**
+             * At this point all the possible content is loaded.
+             * @param map - HashMap with the key as a type name(displayed on the tab) and the value as the actual content
+             */
             @Override
             protected void onPostExecute(final Map<String, String> map) {
-                for(String type : map.keySet()){
-                    // Create tabs with names of content type
-                    tabLayout.addTab(tabLayout.newTab().setText(type));
-                }
 
-                // If only one type of content was found, hide the tab layout
-                if(map.size()<2)
-                    tabLayout.setVisibility(View.GONE);
-
-                final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-                viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-
-
-                FragmentStatePagerAdapter pagerAdapter = new FragmentStatePagerAdapter(getSupportFragmentManager()) {
+                FragmentStatePagerAdapter pagerAdapter = new FragmentStatePagerAdapter(fm) {
                     @Override
                     public Fragment getItem(int position) {
                         // Get the type name from the name of selected tab

@@ -53,6 +53,7 @@ public class SongFragment extends Fragment {
             TextView songTV = (TextView)view.findViewById(R.id.song_text);
             songTV.setText(styleString(text));
             adjustTextSize(songTV);
+            Log.d("fragment", "DONE!");
         }
         return view;
     }

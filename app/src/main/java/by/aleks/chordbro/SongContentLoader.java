@@ -14,9 +14,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Alex on 12/7/15.
@@ -136,14 +134,19 @@ public class SongContentLoader extends AsyncTask<String, Void, Map<String, Strin
         String preferredType = "chords";
         Element prefElement = bestElements.get(preferredType);
         if(prefElement != null) {
-            resultMap.put(preferredType, loadSongText(prefElement.getAttribute("url")));
+            String prefElementContent = loadSongText(prefElement.getAttribute("url"));
+            onFirstResultLoaded(preferredType, prefElementContent, bestElements.keySet());
+            resultMap.put(preferredType, prefElementContent);
             bestElements.remove(preferredType);
         }
 
         for(Element element : bestElements.values()){
             resultMap.put(element.getAttribute("type"), loadSongText(element.getAttribute("url")));
         }
+        Log.d("Loader", "DONE!");
         return resultMap;
     }
+
+    public void onFirstResultLoaded(String loadedType, String firstLoadedContent, Set<String> allContentTypes){}
 
 }
