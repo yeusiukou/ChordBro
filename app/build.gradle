@@ -26,4 +26,5 @@ dependencies {
     compile 'com.android.support:design:23.0.1'
     compile files('libs/gnsdk.jar')
     compile files('libs/gnsdk_helpers.jar')
+    compile 'com.pkmmte.view:circularimageview:1.1'
 }
