@@ -1,7 +1,10 @@
 package by.aleks.chordbro;
 
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -15,6 +18,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
+import com.commit451.nativestackblur.NativeStackBlur;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 import java.util.Map;
 import java.util.Set;
@@ -38,8 +43,10 @@ public class SongActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(artist + " - " + title);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        ImageView artistImage = (ImageView)findViewById(R.id.artist_image);
-        artistImage.setImageResource(R.drawable.muse);
+        final CircleImageView artistImage = (CircleImageView)findViewById(R.id.artist_image);
+        Bitmap blurred = NativeStackBlur.process(BitmapFactory.decodeResource(getResources(),  R.drawable.muse), 60);
+        ImageView artistBackground = (ImageView)findViewById(R.id.artist_background);
+        artistBackground.setImageBitmap(blurred);
 
         final TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
 
@@ -50,6 +57,7 @@ public class SongActivity extends AppCompatActivity {
                 float step = (collapsingToolbar.getHeight() - ViewCompat.getMinimumHeight(collapsingToolbar))/100;
                 float alpha = (collapsingToolbar.getHeight() - ViewCompat.getMinimumHeight(collapsingToolbar) + verticalOffset)/(step*100);
                 tabLayout.setAlpha(alpha); // fade tabs out on toolbar collapsing
+                artistImage.setAlpha(alpha); // fade tabs out on toolbar collapsing
                 toolbar.setTitleTextColor(adjustAlpha(0xFFFFFFFF, 1-alpha < 0 ? 0 : 1-alpha)); // fade in the title
             }
         };

@@ -92,6 +92,7 @@ public class SongContentLoader extends AsyncTask<String, Void, Map<String, Strin
             e.printStackTrace();
         }
         try {
+            //TODO: FIX no internet exception
             Document document = builder.parse(new InputSource(new StringReader(xmlString)));
             return document;
         } catch (SAXException e) {

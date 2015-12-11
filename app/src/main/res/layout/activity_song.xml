@@ -26,8 +26,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
-                    android:id="@+id/artist_image"
-                    android:tint="#78000000"
+                    android:id="@+id/artist_background"
+                    android:tint="#aa000000"
                     app:layout_collapseMode="parallax"/>
 
             <ImageView
@@ -35,6 +35,18 @@
                     android:layout_height="100dp"
                     android:layout_gravity="bottom"
                     android:src="@drawable/gradient"/>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                    android:layout_height="110dp"
+                    android:layout_width="110dp"
+                    android:id="@+id/artist_image"
+                    android:layout_gravity="top|right"
+                    android:layout_marginRight="14dp"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginBottom="?attr/actionBarSize"
+                    android:src="@drawable/muse"
+                    app:civ_border_color="@color/colorAccent"
+                    app:civ_border_width="2dp"/>
 
             <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
