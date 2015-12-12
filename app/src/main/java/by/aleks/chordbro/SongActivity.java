@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import com.commit451.nativestackblur.NativeStackBlur;
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -40,7 +41,8 @@ public class SongActivity extends AppCompatActivity {
         final String artist = "Muse";
         final String title = "Uprising";
 
-        getSupportActionBar().setTitle(artist + " - " + title);
+        getSupportActionBar().setTitle(title);
+        getSupportActionBar().setSubtitle(artist);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         final CircleImageView artistImage = (CircleImageView)findViewById(R.id.artist_image);
@@ -49,6 +51,8 @@ public class SongActivity extends AppCompatActivity {
         artistBackground.setImageBitmap(blurred);
 
         final TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        final LinearLayout icons = (LinearLayout)findViewById(R.id.icons);
+        final LinearLayout songInfo = (LinearLayout)findViewById(R.id.song_info);
 
         // Set inner views behaviour on toolbar collapsing
         AppBarLayout.OnOffsetChangedListener mListener = new AppBarLayout.OnOffsetChangedListener() {
@@ -58,7 +62,10 @@ public class SongActivity extends AppCompatActivity {
                 float alpha = (collapsingToolbar.getHeight() - ViewCompat.getMinimumHeight(collapsingToolbar) + verticalOffset)/(step*100);
                 tabLayout.setAlpha(alpha); // fade tabs out on toolbar collapsing
                 artistImage.setAlpha(alpha); // fade tabs out on toolbar collapsing
+                icons.setAlpha(alpha*0.55f); // fade icons out on toolbar collapsing
+                songInfo.setAlpha(alpha); // fade icons out on toolbar collapsing
                 toolbar.setTitleTextColor(adjustAlpha(0xFFFFFFFF, 1-alpha < 0 ? 0 : 1-alpha)); // fade in the title
+                toolbar.setSubtitleTextColor(adjustAlpha(0xFFFFFFFF, 1-alpha < 0 ? 0 : 1-alpha)); // fade in the title
             }
         };
         AppBarLayout appBar = (AppBarLayout)findViewById(R.id.app_bar);

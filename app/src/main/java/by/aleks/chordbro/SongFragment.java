@@ -4,6 +4,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.ColorRes;
 import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.text.Spanned;
@@ -59,7 +60,7 @@ public class SongFragment extends Fragment {
     }
 
     private Spanned styleString(String songText){
-        String styled = songText.replace("<span class=\"line_end\"></span>", "<br>").replace(" ", "&nbsp;&nbsp;").replace("[ch]", "<font color=\"blue\">").replace("[/ch]", "</font>");
+        String styled = songText.replace("<span class=\"line_end\"></span>", "<br>").replace(" ", "&nbsp;&nbsp;").replace("[ch]", "<font color="+ getResources().getColor(R.color.colorAccentDark)+">").replace("[/ch]", "</font>");
         return Html.fromHtml(styled);
     }
 

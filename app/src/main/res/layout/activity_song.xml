@@ -22,31 +22,119 @@
                 android:layout_height="match_parent"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-            <ImageView
+            <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:id="@+id/artist_background"
-                    android:tint="#aa000000"
-                    app:layout_collapseMode="parallax"/>
+                    android:fitsSystemWindows="true">
 
-            <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:layout_gravity="bottom"
-                    android:src="@drawable/gradient"/>
+                <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:id="@+id/artist_background"
+                        android:tint="#aa000000"
+                        app:layout_collapseMode="parallax"/>
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                    android:layout_height="110dp"
-                    android:layout_width="110dp"
-                    android:id="@+id/artist_image"
-                    android:layout_gravity="top|right"
-                    android:layout_marginRight="14dp"
-                    android:layout_marginTop="14dp"
-                    android:layout_marginBottom="?attr/actionBarSize"
-                    android:src="@drawable/muse"
-                    app:civ_border_color="@color/colorAccent"
-                    app:civ_border_width="2dp"/>
+                <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
+                        android:layout_alignParentBottom="true"
+                        android:src="@drawable/gradient"/>
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                        android:layout_height="110dp"
+                        android:layout_width="110dp"
+                        android:id="@+id/artist_image"
+                        android:layout_gravity="top|end"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:src="@drawable/muse"
+                        app:civ_border_color="@color/colorAccent"
+                        app:civ_border_width="2dp"
+                        android:layout_alignBottom="@+id/icons" android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"/>
+
+                <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="32dp"
+                        android:alpha="0.75"
+                        android:orientation="horizontal"
+                        android:weightSum="3"
+                        android:id="@+id/icons"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_toLeftOf="@+id/artist_image"
+                        android:layout_toStartOf="@+id/artist_image"
+                        android:layout_above="@+id/tabs">
+
+                    <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:id="@+id/button_transpose"
+                            android:src="@drawable/headstock"/>
+
+                    <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:id="@+id/button_favorite"
+                            android:src="@drawable/ic_favorite_outline_white_18dp"/>
+
+                    <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:id="@+id/button_share"
+                            android:src="@drawable/ic_share_white_18dp"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_above="@id/icons"
+                        android:layout_toLeftOf="@id/artist_image"
+                        android:layout_toStartOf="@id/artist_image"
+                        android:id="@+id/song_info"
+                        android:orientation="vertical"
+                        android:layout_marginRight="24dp"
+                        android:layout_marginEnd="24dp"
+                        android:layout_marginTop="14dp"
+                        android:gravity="center_vertical|end">
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/song_title"
+                            android:text="Uprising"
+                            android:textColor="@color/white"
+                            android:textSize="24sp"/>
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="6dp"
+                            android:layout_marginEnd="6dp"
+                            android:id="@+id/song_artist"
+                            android:alpha="0.6"
+                            android:text="Muse"
+                            android:textColor="@color/white"
+                            android:textSize="14sp"/>
+
+                </LinearLayout>
+
+                <android.support.design.widget.TabLayout
+                        android:id="@+id/tabs"
+                        android:layout_width="match_parent"
+                        android:layout_height="?attr/actionBarSize"
+                        android:layout_gravity="bottom"
+                        app:tabTextAppearance="@style/biggerTabText"
+                        app:tabGravity="fill"
+                        app:tabMode="fixed" android:layout_alignParentBottom="true"
+                        android:layout_alignParentLeft="true" android:layout_alignParentStart="true"/>
+
+            </RelativeLayout>
 
             <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
@@ -54,16 +142,6 @@
                     android:layout_width="match_parent"
                     app:layout_collapseMode="pin"
                     app:popupTheme="@style/AppTheme.PopupOverlay"/>
-
-            <android.support.design.widget.TabLayout
-                    android:id="@+id/tabs"
-                    android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    android:layout_below="@+id/toolbar"
-                    android:layout_gravity="bottom"
-                    android:gravity="bottom"
-                    app:tabGravity="fill"
-                    app:tabMode="fixed"/>
 
         </android.support.design.widget.CollapsingToolbarLayout>
 
@@ -75,14 +153,10 @@
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-
-    <!--<android.support.design.widget.FloatingActionButton-->
-    <!--android:id="@+id/fab"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_margin="@dimen/fab_margin"-->
-    <!--app:layout_anchor="@id/app_bar"-->
-    <!--app:layout_anchorGravity="bottom|end"-->
-    <!--android:src="@android:drawable/ic_dialog_email"/>-->
+    <View
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:background="@drawable/shadow"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
 </android.support.design.widget.CoordinatorLayout>
