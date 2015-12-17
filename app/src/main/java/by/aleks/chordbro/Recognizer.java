@@ -207,12 +207,17 @@ public class Recognizer implements Runnable {
         /**
          * When the song is found send it to onPostExecute()
          */
+        private int times = 0;
         @Override
         public void musicIdStreamAlbumResult( GnResponseAlbums result, IGnCancellable canceller ) {
             try {
                 if (result.resultCount() == 0) {
 
                     Recognizer.this.notify("No match");
+                    if(times < 4){
+                        new Thread(new Recognizer(activity)).start();
+                        times++;
+                    } else times = 0;
 
                 } else {
 
