@@ -19,9 +19,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import com.commit451.nativestackblur.NativeStackBlur;
+import android.widget.TextView;
+import com.squareup.picasso.Picasso;
 import de.hdodenhof.circleimageview.CircleImageView;
+import jp.wasabeef.picasso.transformations.BlurTransformation;
+import org.w3c.dom.Text;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,17 +42,25 @@ public class SongActivity extends AppCompatActivity {
                 R.id.toolbar_layout);
         collapsingToolbar.setTitleEnabled(false);
 
-        final String artist = "Muse";
-        final String title = "Uprising";
+        final String artist = getIntent().getStringExtra(getString(R.string.artist_key));
+        final String title = getIntent().getStringExtra(getString(R.string.title_key));
+        final String imageUrl = getIntent().getStringExtra(getString(R.string.image_key));
 
         getSupportActionBar().setTitle(title);
         getSupportActionBar().setSubtitle(artist);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        final CircleImageView artistImage = (CircleImageView)findViewById(R.id.artist_image);
-        Bitmap blurred = NativeStackBlur.process(BitmapFactory.decodeResource(getResources(),  R.drawable.muse), 60);
+        TextView artistTv = (TextView)findViewById(R.id.song_artist);
+        TextView titleTv = (TextView)findViewById(R.id.song_title);
+        artistTv.setText(artist);
+        titleTv.setText(title);
+
         ImageView artistBackground = (ImageView)findViewById(R.id.artist_background);
-        artistBackground.setImageBitmap(blurred);
+        final CircleImageView artistImage = (CircleImageView)findViewById(R.id.artist_image);
+
+        //Download the image from url and set as a backgroudn and to the CircleImageView
+        Picasso.with(this).load(imageUrl).into(artistImage);
+        Picasso.with(this).load(imageUrl).transform(new BlurTransformation(this, 5)).into(artistBackground); // r <= 25
 
         final TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         final LinearLayout icons = (LinearLayout)findViewById(R.id.icons);

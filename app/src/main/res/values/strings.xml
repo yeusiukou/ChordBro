@@ -95,6 +95,11 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
 
+    <string name="artist_key">artist</string>
+    <string name="title_key">title</string>
+    <string name="image_key">image</string>
+    <string name="album_key">album</string>
+
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
