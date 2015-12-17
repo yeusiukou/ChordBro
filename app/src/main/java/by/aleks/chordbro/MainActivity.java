@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity{
                 Intent songIntent = new Intent().setClassName(MainActivity.this, "by.aleks.chordbro.SongActivity");
                 songIntent.putExtra(getString(R.string.artist_key), song.getArtist());
                 songIntent.putExtra(getString(R.string.title_key), song.getTitle());
-                songIntent.putExtra(getString(R.string.image_key), "http://img2-ak.lst.fm/i/u/avatar170s/1c1903b74dc54b63a3a1154576c6380e.jpg");
                 startActivity(songIntent);
             }
         };
@@ -51,12 +50,6 @@ public class MainActivity extends AppCompatActivity{
                 new Thread(recognizer).start();
             }
         });
-
-        Intent songIntent = new Intent().setClassName(MainActivity.this, "by.aleks.chordbro.SongActivity");
-        songIntent.putExtra(getString(R.string.artist_key), "Adele");
-        songIntent.putExtra(getString(R.string.title_key), "Skyfall");
-        songIntent.putExtra(getString(R.string.image_key), "http://img2-ak.lst.fm/i/u/avatar170s/1c1903b74dc54b63a3a1154576c6380e.jpg");
-        startActivity(songIntent);
     }
 
     @Override

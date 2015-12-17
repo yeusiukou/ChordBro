@@ -1,10 +1,6 @@
 package by.aleks.chordbro;
 
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -23,9 +19,6 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 import de.hdodenhof.circleimageview.CircleImageView;
 import jp.wasabeef.picasso.transformations.BlurTransformation;
-import org.w3c.dom.Text;
-
-import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,7 +37,6 @@ public class SongActivity extends AppCompatActivity {
 
         final String artist = getIntent().getStringExtra(getString(R.string.artist_key));
         final String title = getIntent().getStringExtra(getString(R.string.title_key));
-        final String imageUrl = getIntent().getStringExtra(getString(R.string.image_key));
 
         getSupportActionBar().setTitle(title);
         getSupportActionBar().setSubtitle(artist);
@@ -55,12 +47,17 @@ public class SongActivity extends AppCompatActivity {
         artistTv.setText(artist);
         titleTv.setText(title);
 
-        ImageView artistBackground = (ImageView)findViewById(R.id.artist_background);
+        final ImageView artistBackground = (ImageView)findViewById(R.id.artist_background);
         final CircleImageView artistImage = (CircleImageView)findViewById(R.id.artist_image);
 
         //Download the image from url and set as a backgroudn and to the CircleImageView
-        Picasso.with(this).load(imageUrl).into(artistImage);
-        Picasso.with(this).load(imageUrl).transform(new BlurTransformation(this, 5)).into(artistBackground); // r <= 25
+        new LastfmImageFinder(){
+            @Override
+            protected void onPostExecute(String s) {
+                Picasso.with(SongActivity.this).load(s).into(artistImage);
+                Picasso.with(SongActivity.this).load(s).transform(new BlurTransformation(SongActivity.this, 2)).into(artistBackground); // r <= 25
+            }
+        }.execute(artist);
 
         final TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         final LinearLayout icons = (LinearLayout)findViewById(R.id.icons);

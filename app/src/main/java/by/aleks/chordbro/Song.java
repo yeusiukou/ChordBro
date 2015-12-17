@@ -10,13 +10,11 @@ public class Song {
     private String artist;
     private String album;
     private String title;
-    private String image;
 
-    public Song(String artist, String album, String title, String image){
+    public Song(String artist, String album, String title){
         this.artist = artist;
         this.album = album;
         this.title = title;
-        this.image = image;
     }
 
     public String getArtist() {
@@ -28,8 +26,5 @@ public class Song {
     }
     public String getTitle() {
         return title;
-    }
-    public String getImage() {
-        return image;
     }
 }

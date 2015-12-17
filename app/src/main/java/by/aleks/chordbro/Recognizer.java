@@ -226,8 +226,7 @@ public class Recognizer implements Runnable {
                                 Recognizer.this.onResult(new Song(
                                         album.artist().name().display(),
                                         album.title().display(),
-                                        album.trackMatched().title().display(),
-                                        album.artist().contributor().image().asset(GnImageSize.kImageSizeSmall).url()));
+                                        album.trackMatched().title().display()));
                             }
                         });
                     }
