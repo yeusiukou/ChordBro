@@ -9,7 +9,12 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import by.aleks.chordbro.data.Artist;
+import by.aleks.chordbro.data.Content;
+import by.aleks.chordbro.data.Song;
 import com.activeandroid.ActiveAndroid;
+
+import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity{
@@ -34,21 +39,12 @@ public class MainActivity extends AppCompatActivity{
         albumTv = (TextView)findViewById(R.id.album);
         trackTv = (TextView)findViewById(R.id.track);
 
-        //Open song view
-//        Intent songIntent = new Intent().setClassName(MainActivity.this, "by.aleks.chordbro.SongActivity");
-//        songIntent.putExtra(getString(R.string.artist_key), "Adele");
-//        songIntent.putExtra(getString(R.string.title_key), "Hello");
-//        startActivity(songIntent);
-        //////
+        loadAndStart("Hello", "Adele");
         recognizer = new Recognizer(this){
 
             @Override
-            public void onResult(Song song) {
-
-                Intent songIntent = new Intent().setClassName(MainActivity.this, "by.aleks.chordbro.SongActivity");
-                songIntent.putExtra(getString(R.string.artist_key), song.getArtist());
-                songIntent.putExtra(getString(R.string.title_key), song.getTitle());
-                startActivity(songIntent);
+            public void onResult(String title, String artist) {
+                loadAndStart(title, artist);
             }
         };
 
@@ -95,6 +91,41 @@ public class MainActivity extends AppCompatActivity{
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void loadAndStart(final String title, final String artistName){
+
+        new LastfmImageLoader(){
+            @Override
+            protected void onPostExecute(byte[] bytes) {
+                Artist artist = new Artist();
+                artist.name = artistName;
+                artist.image = bytes;
+                artist.save();
+
+                final Song song = new Song();
+                song.artist = artist;
+                song.title = title;
+                song.save();
+
+                new SongContentLoader(){
+                    @Override
+                    protected void onPostExecute(Map<String, String> resultMap) {
+                        for(String instrument : resultMap.keySet()){
+                            Content content = new Content();
+                            content.instrument = instrument;
+                            content.song = song;
+                            content.save();
+                        }
+
+                        Intent songIntent = new Intent().setClassName(MainActivity.this, "by.aleks.chordbro.SongActivity");
+                        songIntent.putExtra(getString(R.string.artist_key), artistName);
+                        songIntent.putExtra(getString(R.string.title_key), title);
+                        startActivity(songIntent);
+                    }
+                }.execute(artistName, title);
+            }
+        }.execute(artistName);
     }
 
 }

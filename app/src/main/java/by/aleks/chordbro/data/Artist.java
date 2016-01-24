@@ -11,7 +11,7 @@ import com.activeandroid.annotation.Table;
 @Table(name = "Artists")
 public class Artist extends Model {
 
-    @Column(name = "Name")
+    @Column(name = "Name", unique = true, onUniqueConflict = Column.ConflictAction.FAIL)
     public String name;
 
     @Column(name = "Image")

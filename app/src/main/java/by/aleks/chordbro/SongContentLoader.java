@@ -132,14 +132,14 @@ public class SongContentLoader extends AsyncTask<String, Void, Map<String, Strin
         Map<String, String> resultMap = new LinkedHashMap<>();
 
         // Load preferred type in the first place
-        String preferredType = "chords";
-        Element prefElement = bestElements.get(preferredType);
-        if(prefElement != null) {
-            String prefElementContent = loadSongText(prefElement.getAttribute("url"));
-            onFirstResultLoaded(preferredType, prefElementContent, bestElements.keySet());
-            resultMap.put(preferredType, prefElementContent);
-            bestElements.remove(preferredType);
-        }
+//        String preferredType = "chords";
+//        Element prefElement = bestElements.get(preferredType);
+//        if(prefElement != null) {
+//            String prefElementContent = loadSongText(prefElement.getAttribute("url"));
+//            onFirstResultLoaded(preferredType, prefElementContent, bestElements.keySet());
+//            resultMap.put(preferredType, prefElementContent);
+//            bestElements.remove(preferredType);
+//        }
 
         for(Element element : bestElements.values()){
             resultMap.put(element.getAttribute("type"), loadSongText(element.getAttribute("url")));
@@ -148,6 +148,6 @@ public class SongContentLoader extends AsyncTask<String, Void, Map<String, Strin
         return resultMap;
     }
 
-    public void onFirstResultLoaded(String loadedType, String firstLoadedContent, Set<String> allContentTypes){}
+//    public void onFirstResultLoaded(String loadedType, String firstLoadedContent, Set<String> allContentTypes){}
 
 }

@@ -2,6 +2,8 @@ package by.aleks.chordbro;
 
 import android.app.Activity;
 import android.util.Log;
+import by.aleks.chordbro.data.Artist;
+import by.aleks.chordbro.data.Song;
 import com.gracenote.gnsdk.*;
 
 import java.util.ArrayList;
@@ -96,9 +98,10 @@ public class Recognizer implements Runnable {
 
     /**
      * The method is called from the UI thread. Use just like onPostExecute
-     * @param song recognized song
+     * @param title - name of the recognized song
+     * @param artist - name of the artist
      */
-    public void onResult(Song song){};
+    public void onResult(String title, String artist){};
 
     public void startAudioProcess() {
 
@@ -228,10 +231,9 @@ public class Recognizer implements Runnable {
                         activity.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Recognizer.this.onResult(new Song(
-                                        album.artist().name().display(),
-                                        album.title().display(),
-                                        album.trackMatched().title().display()));
+                                Recognizer.this.onResult(
+                                        album.trackMatched().title().display(), // song title
+                                        album.artist().name().display()); // artist name
                             }
                         });
                     }

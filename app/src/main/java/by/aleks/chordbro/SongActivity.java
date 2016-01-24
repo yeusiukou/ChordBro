@@ -1,5 +1,7 @@
 package by.aleks.chordbro;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -16,11 +18,13 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import by.aleks.chordbro.data.Content;
+import by.aleks.chordbro.data.Song;
 import com.squareup.picasso.Picasso;
 import de.hdodenhof.circleimageview.CircleImageView;
 import jp.wasabeef.picasso.transformations.BlurTransformation;
+
 import java.util.Map;
-import java.util.Set;
 
 public class SongActivity extends AppCompatActivity {
 
@@ -37,6 +41,7 @@ public class SongActivity extends AppCompatActivity {
 
         final String artist = getIntent().getStringExtra(getString(R.string.artist_key));
         final String title = getIntent().getStringExtra(getString(R.string.title_key));
+        Song song = Song.find(title, artist);
 
         getSupportActionBar().setTitle(title);
         getSupportActionBar().setSubtitle(artist);
@@ -47,17 +52,13 @@ public class SongActivity extends AppCompatActivity {
         artistTv.setText(artist);
         titleTv.setText(title);
 
+        // Set image
         final ImageView artistBackground = (ImageView)findViewById(R.id.artist_background);
         final CircleImageView artistImage = (CircleImageView)findViewById(R.id.artist_image);
-
-        //Download the image from url and set as a backgroudn and to the CircleImageView
-        new LastfmImageFinder(){
-            @Override
-            protected void onPostExecute(String s) {
-                Picasso.with(SongActivity.this).load(s).into(artistImage);
-                Picasso.with(SongActivity.this).load(s).transform(new BlurTransformation(SongActivity.this, 2)).into(artistBackground); // r <= 25
-            }
-        }.execute(artist);
+        byte[] byteArray = song.artist.image;
+        Bitmap bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+        artistBackground.setImageBitmap(bmp);
+        artistImage.setImageBitmap(bmp);
 
         final TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         final LinearLayout icons = (LinearLayout)findViewById(R.id.icons);
@@ -80,94 +81,56 @@ public class SongActivity extends AppCompatActivity {
         AppBarLayout appBar = (AppBarLayout)findViewById(R.id.app_bar);
         appBar.addOnOffsetChangedListener(mListener);
 
-        // Load and display content
-        new SongContentLoader(){
+        /**
+         * Load from db and display the chords
+         */
+        final Map<String, Content> contentMap = Content.getAll(song);
+        // If only one type of content was found, hide the tab layout
+        if(contentMap.size()<2){
+            tabLayout.setVisibility(View.GONE);
+            return;
+        }
 
-            private final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-            private final FragmentManager fm = getSupportFragmentManager();
+        final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        FragmentManager fm = getSupportFragmentManager();
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
 
-            /**
-             * To reduce the waiting time we don't wait until the all content is loaded.
-             * While the first fragment is being showed we load other possible fragments.
-             */
+        for(String instrument : contentMap.keySet()){
+            // Create tabs with names of instruments
+            tabLayout.addTab(tabLayout.newTab().setText(instrument));
+        }
+
+        FragmentStatePagerAdapter pagerAdapter = new FragmentStatePagerAdapter(fm) {
             @Override
-            public void onFirstResultLoaded(final String loadedType, final String firstLoadedContent, final Set<String> allContentTypes) {
-                SongActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        // If only one type of content was found, hide the tab layout
-                        if(allContentTypes.size()<2){
-                            tabLayout.setVisibility(View.GONE);
-                            return;
-                        }
-
-                        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-
-                        // Add the preferred tab first
-                        tabLayout.addTab(tabLayout.newTab().setText(loadedType));
-                        allContentTypes.remove(loadedType);
-
-                        for(String type : allContentTypes){
-                            // Create tabs with names of content type
-                            tabLayout.addTab(tabLayout.newTab().setText(type));
-                        }
-
-                        // Temporary adapter while we don't have the
-                        viewPager.setAdapter(new FragmentStatePagerAdapter(fm) {
-                            @Override
-                            public Fragment getItem(int position) {
-                                return SongFragment.newInstance(firstLoadedContent);
-                            }
-
-                            @Override
-                            public int getCount() {
-                                return 1;
-                            }
-                        });
-                    }
-                });
+            public Fragment getItem(int position) {
+                // Get the instrument name from the name of selected tab
+                String instrument = tabLayout.getTabAt(position).getText().toString();
+                // Create a fragment with the given type song content
+                return SongFragment.newInstance(contentMap.get(instrument).text);
             }
 
-            /**
-             * At this point all the possible content is loaded.
-             * @param map - HashMap with the key as a type name(displayed on the tab) and the value as the actual content
-             */
             @Override
-            protected void onPostExecute(final Map<String, String> map) {
-
-                FragmentStatePagerAdapter pagerAdapter = new FragmentStatePagerAdapter(fm) {
-                    @Override
-                    public Fragment getItem(int position) {
-                        // Get the type name from the name of selected tab
-                        String type = tabLayout.getTabAt(position).getText().toString();
-                        // Create a fragment with the given type song content
-                        return SongFragment.newInstance(map.get(type));
-                    }
-
-                    @Override
-                    public int getCount() {
-                        return tabLayout.getTabCount();
-                    }
-                };
-                viewPager.setAdapter(pagerAdapter);
-
-                tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-                    @Override
-                    public void onTabSelected(TabLayout.Tab tab) {
-                        viewPager.setCurrentItem(tab.getPosition());
-                    }
-
-                    @Override
-                    public void onTabUnselected(TabLayout.Tab tab) {
-                    }
-
-                    @Override
-                    public void onTabReselected(TabLayout.Tab tab) {
-                    }
-                });
+            public int getCount() {
+                return tabLayout.getTabCount();
             }
-        }.execute(artist, title);
+        };
+        viewPager.setAdapter(pagerAdapter);
+
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
+        });
+        viewPager.setAdapter(pagerAdapter);
 
     }
 
