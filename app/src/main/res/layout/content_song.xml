@@ -14,8 +14,8 @@
             android:layout_height="wrap_content"
             android:padding="@dimen/text_margin"
             android:id="@+id/song_text"
-            android:background="@drawable/content_background"
             android:text="@string/large_text"
-            android:textSize="10sp"/>
+            android:background="@drawable/content_background"
+            android:textSize="6sp"/>
 
 </android.support.v4.widget.NestedScrollView>

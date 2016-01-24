@@ -1,7 +1,9 @@
 package by.aleks.chordbro;
 
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.ColorRes;
@@ -12,12 +14,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 public class SongFragment extends Fragment {
 
     private static final String TEXT_PARAM = "text";
     private String text;
+    private static final String TAG = "SongFragment";
 
     /**
      * Use this factory method to create a new instance of
@@ -51,16 +55,28 @@ public class SongFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_song, container, false);
         if (getArguments() != null) {
             text = getArguments().getString(TEXT_PARAM);
-            TextView songTV = (TextView)view.findViewById(R.id.song_text);
+            final TextView songTV = (TextView)view.findViewById(R.id.song_text);
             songTV.setText(styleString(text));
-            adjustTextSize(songTV);
+
+            Typeface myTypeface = Typeface.createFromAsset(getActivity().getAssets(), "monaco.ttf");
+            songTV.setTypeface(myTypeface);
+
+            // Adjust the text size, only when text view gets its width
+            songTV.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    // Ensure you call it only once :
+                    songTV.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                    adjustTextSize(songTV);
+                }
+            });
             Log.d("fragment", "DONE!");
         }
         return view;
     }
 
     private Spanned styleString(String songText){
-        String styled = songText.replace("<span class=\"line_end\"></span>", "<br>").replace(" ", "&nbsp;&nbsp;").replace("[ch]", "<font color="+ getResources().getColor(R.color.colorAccentDark)+">").replace("[/ch]", "</font>");
+        String styled = songText.replace("<span class=\"line_end\"></span>", "<br>").replace(" ", "&nbsp;").replace("[ch]", "<font color="+ getResources().getColor(R.color.colorAccentDark)+">").replace("[/ch]", "</font>");
         return Html.fromHtml(styled);
     }
 
@@ -75,21 +91,17 @@ public class SongFragment extends Fragment {
         }
 
         //Adjust the font size to fit the longest line
-        Rect bounds = new Rect();
-        int width = 0;
         while(true){
             Paint textPaint = textView.getPaint();
-            textPaint.getTextBounds(longestLine,0,longestLine.length(),bounds);
-            width = bounds.width();
-
+            float width = textPaint.measureText(longestLine);
             ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) textView.getLayoutParams();
             float indents = textView.getTotalPaddingLeft() + textView.getTotalPaddingRight() + lp.leftMargin + lp.rightMargin;
-            //0.7 is a value I found experimentally.
-            if(textView.getWidth()*0.7 - indents > width){
-                textView.setTextSize(pixelsToSp(textView.getTextSize())+0.3f);
-                Log.d("adjustTS", "tv: " + textView.getWidth() + "width: " + width + ", size:" + textView.getTextSize());
-            }
-            else break;
+            Log.d(TAG, "Indents = "+indents);
+            Log.d(TAG, "TextView width: " + textView.getWidth() + "Measured width: " + width + ", Text size:" + textView.getTextSize());
+
+            if(textView.getMeasuredWidth()*0.95f - indents > width){ // 0.95f - experimental value
+                textView.setTextSize(pixelsToSp(textView.getTextSize()) + 0.3f);
+            } else break;
         }
     }
 

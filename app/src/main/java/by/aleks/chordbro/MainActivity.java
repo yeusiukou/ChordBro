@@ -34,6 +34,12 @@ public class MainActivity extends AppCompatActivity{
         albumTv = (TextView)findViewById(R.id.album);
         trackTv = (TextView)findViewById(R.id.track);
 
+        //Open song view
+//        Intent songIntent = new Intent().setClassName(MainActivity.this, "by.aleks.chordbro.SongActivity");
+//        songIntent.putExtra(getString(R.string.artist_key), "Adele");
+//        songIntent.putExtra(getString(R.string.title_key), "Hello");
+//        startActivity(songIntent);
+        //////
         recognizer = new Recognizer(this){
 
             @Override
