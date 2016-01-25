@@ -36,7 +36,7 @@
         </activity>
 
         <meta-data android:name="AA_DB_NAME" android:value="songs.db" />
-        <meta-data android:name="AA_DB_VERSION" android:value="5" />
+        <meta-data android:name="AA_DB_VERSION" android:value="6" />
     </application>
 
 </manifest>

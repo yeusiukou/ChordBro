@@ -5,7 +5,7 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
-import java.util.List;
+import java.util.Date;
 
 /**
  * Created by Alex on 12/18/15.
@@ -19,6 +19,12 @@ public class Song extends Model {
 
     @Column(name = "Artist", notNull = true)
     public Artist artist;
+
+    @Column(name = "Album")
+    public String album;
+
+    @Column(name = "Timestamp", index = true)
+    public Date timestamp = new Date();
 
     @Column(name = "Favorite", notNull = true)
     public boolean favorite = false;
@@ -35,6 +41,7 @@ public class Song extends Model {
                 .from(Song.class)
                 .where("Title = ?", title)
                 .where("Artist = ?", artist.getId())
+                .orderBy("Timestamp DESC")
                 .executeSingle();
     }
 }

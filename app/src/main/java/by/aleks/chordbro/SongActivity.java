@@ -95,9 +95,15 @@ public class SongActivity extends AppCompatActivity {
         FragmentManager fm = getSupportFragmentManager();
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
 
+
+        // Create tabs with names of instruments
+        String prefInstrument = "chords";
+        if(contentMap.containsKey(prefInstrument)) { // Add the preferred type of chords first
+            tabLayout.addTab(tabLayout.newTab().setText(prefInstrument));
+        }
         for(String instrument : contentMap.keySet()){
-            // Create tabs with names of instruments
-            tabLayout.addTab(tabLayout.newTab().setText(instrument));
+            if( !instrument.equals(prefInstrument) ) // don't add the preferred instrument once again
+                tabLayout.addTab(tabLayout.newTab().setText(instrument));
         }
 
         FragmentStatePagerAdapter pagerAdapter = new FragmentStatePagerAdapter(fm) {

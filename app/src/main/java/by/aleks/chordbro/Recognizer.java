@@ -101,7 +101,7 @@ public class Recognizer implements Runnable {
      * @param title - name of the recognized song
      * @param artist - name of the artist
      */
-    public void onResult(String title, String artist){};
+    public void onResult(String title, String artist, String album){};
 
     public void startAudioProcess() {
 
@@ -233,7 +233,8 @@ public class Recognizer implements Runnable {
                             public void run() {
                                 Recognizer.this.onResult(
                                         album.trackMatched().title().display(), // song title
-                                        album.artist().name().display()); // artist name
+                                        album.artist().name().display(), // artist name
+                                        album.title().display()); // album name
                             }
                         });
                     }

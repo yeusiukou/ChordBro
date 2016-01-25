@@ -19,11 +19,6 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity{
 
-
-    private TextView artistTv;
-    private TextView albumTv;
-    private TextView trackTv;
-
     private Recognizer recognizer;
 
     @Override
@@ -35,16 +30,12 @@ public class MainActivity extends AppCompatActivity{
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        artistTv = (TextView)findViewById(R.id.artist);
-        albumTv = (TextView)findViewById(R.id.album);
-        trackTv = (TextView)findViewById(R.id.track);
-
-//        loadAndStart("Hello", "Adele");
+//        loadAndStart("Hello", "Adele", "");
         recognizer = new Recognizer(this){
 
             @Override
-            public void onResult(String title, String artist) {
-                loadAndStart(title, artist);
+            public void onResult(String title, String artist, String album) {
+                loadAndStart(title, artist, album);
             }
         };
 
@@ -93,7 +84,7 @@ public class MainActivity extends AppCompatActivity{
         return super.onOptionsItemSelected(item);
     }
 
-    private void loadAndStart(final String title, final String artistName){
+    private void loadAndStart(final String title, final String artistName, final String album){
 
         // If the song already exists in db, don't load anything
         if(Song.find(title, artistName) != null){
@@ -112,20 +103,21 @@ public class MainActivity extends AppCompatActivity{
                     artist.image = bytes;
                     artist.save();
 
-                    addSongToDb(title, artist);
+                    addSongToDb(title, artist, album);
                     startSongActivity(title, artistName);
                 }
             }.execute(artistName);
         } else {
-            addSongToDb(title, artist);
+            addSongToDb(title, artist, album);
             startSongActivity(title, artistName);
         }
     }
 
-    private void addSongToDb(final String title, final Artist artist){
+    private void addSongToDb(final String title, final Artist artist, final String album){
         final Song song = new Song();
         song.artist = artist;
         song.title = title;
+        song.album = album;
         song.save();
 
         new SongContentLoader(){
