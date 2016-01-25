@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity{
         albumTv = (TextView)findViewById(R.id.album);
         trackTv = (TextView)findViewById(R.id.track);
 
-        loadAndStart("Hello", "Adele");
+//        loadAndStart("Hello", "Adele");
         recognizer = new Recognizer(this){
 
             @Override
@@ -95,37 +95,59 @@ public class MainActivity extends AppCompatActivity{
 
     private void loadAndStart(final String title, final String artistName){
 
-        new LastfmImageLoader(){
+        // If the song already exists in db, don't load anything
+        if(Song.find(title, artistName) != null){
+            startSongActivity(title, artistName);
+            return;
+        }
+
+        Artist artist = Artist.findByName(artistName);
+        if(artist == null){ // If no such artist in the db, download the image and add the artist
+            new LastfmImageLoader(){
+                @Override
+                protected void onPostExecute(byte[] bytes) {
+
+                    Artist artist = new Artist();
+                    artist.name = artistName;
+                    artist.image = bytes;
+                    artist.save();
+
+                    addSongToDb(title, artist);
+                    startSongActivity(title, artistName);
+                }
+            }.execute(artistName);
+        } else {
+            addSongToDb(title, artist);
+            startSongActivity(title, artistName);
+        }
+    }
+
+    private void addSongToDb(final String title, final Artist artist){
+        final Song song = new Song();
+        song.artist = artist;
+        song.title = title;
+        song.save();
+
+        new SongContentLoader(){
             @Override
-            protected void onPostExecute(byte[] bytes) {
-                Artist artist = new Artist();
-                artist.name = artistName;
-                artist.image = bytes;
-                artist.save();
-
-                final Song song = new Song();
-                song.artist = artist;
-                song.title = title;
-                song.save();
-
-                new SongContentLoader(){
-                    @Override
-                    protected void onPostExecute(Map<String, String> resultMap) {
-                        for(String instrument : resultMap.keySet()){
-                            Content content = new Content();
-                            content.instrument = instrument;
-                            content.song = song;
-                            content.save();
-                        }
-
-                        Intent songIntent = new Intent().setClassName(MainActivity.this, "by.aleks.chordbro.SongActivity");
-                        songIntent.putExtra(getString(R.string.artist_key), artistName);
-                        songIntent.putExtra(getString(R.string.title_key), title);
-                        startActivity(songIntent);
-                    }
-                }.execute(artistName, title);
+            protected void onPostExecute(Map<String, String> resultMap) {
+                for(String instrument : resultMap.keySet()){
+                    Content content = new Content();
+                    content.instrument = instrument;
+                    content.song = song;
+                    content.text = resultMap.get(instrument);
+                    content.save();
+                }
+                startSongActivity(title, artist.name);
             }
-        }.execute(artistName);
+        }.execute(artist.name, title);
+    }
+
+    private void startSongActivity(String title, String artistName){
+        Intent songIntent = new Intent().setClassName(MainActivity.this, "by.aleks.chordbro.SongActivity");
+        songIntent.putExtra(getString(R.string.artist_key), artistName);
+        songIntent.putExtra(getString(R.string.title_key), title);
+        startActivity(songIntent);
     }
 
 }

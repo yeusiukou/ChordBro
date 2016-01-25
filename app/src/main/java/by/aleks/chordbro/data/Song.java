@@ -28,6 +28,8 @@ public class Song extends Model {
                 .from(Artist.class)
                 .where("Name = ?", artistName)
                 .executeSingle();
+        if(artist == null)
+            return null;
 
         return new Select()
                 .from(Song.class)
