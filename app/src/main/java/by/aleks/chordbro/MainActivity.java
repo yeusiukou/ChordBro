@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity{
         }.execute(artist.name, title);
     }
 
-    private void startSongActivity(String title, String artistName){
+    public void startSongActivity(String title, String artistName){
         Intent songIntent = new Intent().setClassName(MainActivity.this, "by.aleks.chordbro.SongActivity");
         songIntent.putExtra(getString(R.string.artist_key), artistName);
         songIntent.putExtra(getString(R.string.title_key), title);

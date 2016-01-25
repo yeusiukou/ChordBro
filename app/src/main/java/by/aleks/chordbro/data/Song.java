@@ -6,6 +6,7 @@ import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Alex on 12/18/15.
@@ -41,7 +42,13 @@ public class Song extends Model {
                 .from(Song.class)
                 .where("Title = ?", title)
                 .where("Artist = ?", artist.getId())
-                .orderBy("Timestamp DESC")
                 .executeSingle();
+    }
+
+    public static List<Song> getAll(){
+        return new Select()
+                .from(Song.class)
+                .orderBy("Timestamp DESC")
+                .execute();
     }
 }
