@@ -12,6 +12,7 @@ import android.widget.TextView;
 import by.aleks.chordbro.data.Song;
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -41,6 +42,7 @@ public class SongAdapter extends ArrayAdapter<Song> {
             TextView artist = (TextView) view.findViewById(R.id.item_artist);
             TextView title = (TextView) view.findViewById(R.id.item_title);
             TextView album = (TextView) view.findViewById(R.id.item_album);
+            TextView time = (TextView) view.findViewById(R.id.item_time);
             CircleImageView image = (CircleImageView) view.findViewById(R.id.item_image);
 
             if (artist != null)
@@ -59,9 +61,31 @@ public class SongAdapter extends ArrayAdapter<Song> {
                     album.setVisibility(View.GONE);
                 album.setText(currentSong.album);
             }
+            time.setText(dateToString(currentSong.timestamp));
+
+            // display icons
+            if(currentSong.chordcount == 0)
+                view.findViewById(R.id.item_no_chords).setVisibility(View.VISIBLE);
+            else if(currentSong.favorite)
+                view.findViewById(R.id.item_favorite).setVisibility(View.VISIBLE);
         }
 
         return view;
+    }
+
+    private String dateToString(Date date){
+        long ms = new Date().getTime() - date.getTime(); // milliseconds since
+        float hs = ((float)ms) / ( 60*60*1000 );
+        if(hs < 1)
+            return (int)(hs*60)+"m";
+        else if (hs < 24)
+            return (int)hs+"h";
+        else {
+            int days = (int)(hs/24);
+            if(days < 365)
+                return days+"d";
+            else return days/365+"y";
+        }
     }
 
 }

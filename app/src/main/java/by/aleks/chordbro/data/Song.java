@@ -30,6 +30,10 @@ public class Song extends Model {
     @Column(name = "Favorite", notNull = true)
     public boolean favorite = false;
 
+    @Column(name = "ChordCount")
+    //Shows how many chord types the song has. The number get updated in MainActivity
+    public int chordcount = 0;
+
     public static Song find(String title, String artistName){
         Artist artist = new Select()
                 .from(Artist.class)

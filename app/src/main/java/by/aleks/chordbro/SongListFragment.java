@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 import by.aleks.chordbro.data.Song;
 
 import java.util.List;
@@ -32,7 +33,9 @@ public class SongListFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Song song = songList.get(i);
-                ((MainActivity)getActivity()).startSongActivity(song.title, song.artist.name);
+                if (song.chordcount > 0)
+                    ((MainActivity) getActivity()).startSongActivity(song.title, song.artist.name);
+                else Toast.makeText(getActivity(), getString(R.string.no_chords), Toast.LENGTH_SHORT).show();
             }
         });
         songListView.setDivider(null);

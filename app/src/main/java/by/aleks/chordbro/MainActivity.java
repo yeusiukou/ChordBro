@@ -129,6 +129,9 @@ public class MainActivity extends AppCompatActivity{
                     content.song = song;
                     content.text = resultMap.get(instrument);
                     content.save();
+
+                    song.chordcount++; //Increase the number of chord types
+                    song.save();
                 }
                 startSongActivity(title, artist.name);
             }
