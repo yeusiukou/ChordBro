@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import by.aleks.chordbro.data.Song;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class SongAdapter extends ArrayAdapter<Song> {
             TextView artist = (TextView) view.findViewById(R.id.item_artist);
             TextView title = (TextView) view.findViewById(R.id.item_title);
             TextView album = (TextView) view.findViewById(R.id.item_album);
-            ImageView image = (ImageView) view.findViewById(R.id.item_image);
+            CircleImageView image = (CircleImageView) view.findViewById(R.id.item_image);
 
             if (artist != null)
                 artist.setText(currentSong.artist.name);
@@ -54,8 +55,9 @@ public class SongAdapter extends ArrayAdapter<Song> {
                 title.setText(currentSong.title);
 
             if (album != null)
+                if(currentSong.album == null || currentSong.album.equals(""))
+                    album.setVisibility(View.GONE);
                 album.setText(currentSong.album);
-
             }
         }
 
