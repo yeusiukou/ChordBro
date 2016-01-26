@@ -102,13 +102,17 @@
                         android:layout_marginTop="14dp"
                         android:gravity="center_vertical|end">
 
+
                     <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
                             android:id="@+id/song_title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="right"
+                            android:layout_marginLeft="21dp"
                             android:text="Uprising"
                             android:textColor="@color/white"
-                            android:textSize="24sp"/>
+                            android:textSize="6sp"
+                            android:singleLine="true"/>
 
                     <TextView
                             android:layout_width="wrap_content"

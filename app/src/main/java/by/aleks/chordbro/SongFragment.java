@@ -67,7 +67,7 @@ public class SongFragment extends Fragment {
                 public void onGlobalLayout() {
                     // Ensure you call it only once :
                     songTV.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                    adjustTextSize(songTV);
+                    Util.adjustTextSize(songTV, 16);
                 }
             });
             Log.d("fragment", "DONE!");
@@ -78,35 +78,5 @@ public class SongFragment extends Fragment {
     private Spanned styleString(String songText){
         String styled = songText.replace("<span class=\"line_end\"></span>", "<br>").replace(" ", "&nbsp;").replace("[ch]", "<font color="+ getResources().getColor(R.color.colorAccentDark)+">").replace("[/ch]", "</font>");
         return Html.fromHtml(styled);
-    }
-
-    private void adjustTextSize(TextView textView){
-
-        //Find the longest line
-        String[] lines = textView.getText().toString().split("\n");
-        String longestLine = "";
-        for(String line:lines){
-            if(line.length()>longestLine.length())
-                longestLine = line;
-        }
-
-        //Adjust the font size to fit the longest line
-        while(true){
-            Paint textPaint = textView.getPaint();
-            float width = textPaint.measureText(longestLine);
-            ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) textView.getLayoutParams();
-            float indents = textView.getTotalPaddingLeft() + textView.getTotalPaddingRight() + lp.leftMargin + lp.rightMargin;
-            Log.d(TAG, "Indents = "+indents);
-            Log.d(TAG, "TextView width: " + textView.getWidth() + "Measured width: " + width + ", Text size:" + textView.getTextSize());
-
-            if(textView.getMeasuredWidth()*0.95f - indents > width){ // 0.95f - experimental value
-                textView.setTextSize(pixelsToSp(textView.getTextSize()) + 0.3f);
-            } else break;
-        }
-    }
-
-    private float pixelsToSp(float px) {
-        float scaledDensity = getView().getResources().getDisplayMetrics().scaledDensity;
-        return px/scaledDensity;
     }
 }
