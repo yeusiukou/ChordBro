@@ -23,9 +23,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import by.aleks.chordbro.data.Content;
 import by.aleks.chordbro.data.Song;
-import com.squareup.picasso.Picasso;
+import com.commit451.nativestackblur.NativeStackBlur;
 import de.hdodenhof.circleimageview.CircleImageView;
-import jp.wasabeef.picasso.transformations.BlurTransformation;
 
 import java.util.Map;
 
@@ -61,8 +60,8 @@ public class SongActivity extends AppCompatActivity {
         final CircleImageView artistImage = (CircleImageView)findViewById(R.id.artist_image);
         byte[] byteArray = song.artist.image;
         Bitmap bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
-        artistBackground.setImageBitmap(bmp);
         artistImage.setImageBitmap(bmp);
+        artistBackground.setImageBitmap(NativeStackBlur.process(bmp, 3));
 
         final TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         final LinearLayout icons = (LinearLayout)findViewById(R.id.icons);
