@@ -2,6 +2,7 @@ package by.aleks.chordbro;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,12 +20,13 @@ public class SongListFragment extends Fragment {
 
     private View rootView;
     private SongAdapter adapter;
+    private List<Song> songList;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
 
-        final List<Song> songList = Song.getAll();
+        songList = Song.getAll();
         adapter = new SongAdapter(getActivity(), R.layout.song_list_item, songList);
         final ListView songListView = (ListView) rootView.findViewById(R.id.song_list_view);
         songListView.setAdapter(adapter);
@@ -45,6 +47,10 @@ public class SongListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        songList.clear();
+        songList.addAll(Song.getAll());
         adapter.notifyDataSetChanged();
     }
+
+
 }

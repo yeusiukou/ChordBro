@@ -11,6 +11,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -43,7 +44,7 @@ public class SongActivity extends AppCompatActivity {
 
         final String artist = getIntent().getStringExtra(getString(R.string.artist_key));
         final String title = getIntent().getStringExtra(getString(R.string.title_key));
-        Song song = Song.find(title, artist);
+        final Song song = Song.find(title, artist);
 
         getSupportActionBar().setTitle(title);
         getSupportActionBar().setSubtitle(artist);
@@ -53,6 +54,7 @@ public class SongActivity extends AppCompatActivity {
         TextView titleTv = (TextView)findViewById(R.id.song_title);
         artistTv.setText(artist);
         titleTv.setText(title);
+        initFavButton(song);
 
         // Set image
         final ImageView artistBackground = (ImageView)findViewById(R.id.artist_background);
@@ -156,5 +158,28 @@ public class SongActivity extends AppCompatActivity {
         int green = Color.green(color);
         int blue = Color.blue(color);
         return Color.argb(alpha, red, green, blue);
+    }
+
+    private void initFavButton(final Song song){
+        final ImageView favButton = (ImageView)findViewById(R.id.button_favorite);
+        if(song.favorite){
+            favButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_favorite_white_24dp));
+            favButton.setColorFilter(Color.RED);
+        }
+        favButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(song.favorite){
+                    song.favorite = false;
+                    favButton.setImageDrawable(ContextCompat.getDrawable(SongActivity.this, R.drawable.ic_favorite_outline_white_18dp));
+                    favButton.clearColorFilter();
+                } else {
+                    song.favorite = true;
+                    favButton.setImageDrawable(ContextCompat.getDrawable(SongActivity.this, R.drawable.ic_favorite_white_24dp));
+                    favButton.setColorFilter(Color.RED);
+                }
+                song.save();
+            }
+        });
     }
 }

@@ -20,9 +20,11 @@ import java.util.List;
  */
 public class SongAdapter extends ArrayAdapter<Song> {
 
+    private List<Song> items;
 
     public SongAdapter(Context context, int resource, List<Song> items) {
         super(context, resource, items);
+        this.items = items;
     }
 
     @Override
@@ -64,10 +66,12 @@ public class SongAdapter extends ArrayAdapter<Song> {
             time.setText(dateToString(currentSong.timestamp));
 
             // display icons
+            View favicon = view.findViewById(R.id.item_favorite);
             if(currentSong.chordcount == 0)
                 view.findViewById(R.id.item_no_chords).setVisibility(View.VISIBLE);
             else if(currentSong.favorite)
-                view.findViewById(R.id.item_favorite).setVisibility(View.VISIBLE);
+                favicon.setVisibility(View.VISIBLE);
+            else favicon.setVisibility(View.INVISIBLE);
         }
 
         return view;
