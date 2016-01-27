@@ -16,9 +16,13 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TabHost;
 import android.widget.TextView;
 import by.aleks.chordbro.data.Content;
 import by.aleks.chordbro.data.Song;
@@ -88,9 +92,18 @@ public class SongActivity extends AppCompatActivity {
          */
         final Map<String, Content> contentMap = Content.getAll(song);
         // If only one type of content was found, hide the tab layout
-        if(contentMap.size()<2){
-            tabLayout.setVisibility(View.GONE);
-            return;
+        if(contentMap.size()<2) {
+            //TODO: Temporary and dirty workaround. The layout needs to be improved.
+            ViewGroup.LayoutParams tabLp = tabLayout.getLayoutParams();
+            int tabHeight = tabLp.height;
+            tabLp.height = dpToPx(25);
+            tabLayout.setLayoutParams(tabLp);
+            tabLayout.setVisibility(View.INVISIBLE);
+
+            ViewGroup parent = (ViewGroup)tabLayout.getParent().getParent().getParent();
+            ViewGroup.LayoutParams lp = parent.getLayoutParams();
+            lp.height = lp.height - tabHeight + tabLp.height;
+            parent.setLayoutParams(lp);
         }
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
@@ -171,5 +184,11 @@ public class SongActivity extends AppCompatActivity {
                 song.save();
             }
         });
+    }
+
+    private int dpToPx(int dp) {
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        int px = Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
+        return px;
     }
 }
