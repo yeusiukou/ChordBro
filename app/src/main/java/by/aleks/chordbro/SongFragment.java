@@ -55,21 +55,12 @@ public class SongFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_song, container, false);
         if (getArguments() != null) {
             text = getArguments().getString(TEXT_PARAM);
-            final TextView songTV = (TextView)view.findViewById(R.id.song_text);
+            DynamicTextView songTV = (DynamicTextView)view.findViewById(R.id.song_text);
             songTV.setText(styleString(text));
 
             Typeface myTypeface = Typeface.createFromAsset(getActivity().getAssets(), "monaco.ttf");
             songTV.setTypeface(myTypeface);
 
-            // Adjust the text size, only when text view gets its width
-            songTV.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    // Ensure you call it only once :
-                    songTV.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                    Util.adjustTextSize(songTV, 16);
-                }
-            });
             Log.d("fragment", "DONE!");
         }
         return view;

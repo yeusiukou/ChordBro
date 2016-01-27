@@ -9,13 +9,13 @@
         android:layout_height="match_parent"
         tools:context="by.aleks.chordbro.SongActivity">
 
-    <TextView
+    <by.aleks.chordbro.DynamicTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="@dimen/text_margin"
             android:id="@+id/song_text"
             android:text="@string/large_text"
             android:background="@drawable/content_background"
-            android:textSize="6sp"/>
+            android:textSize="16sp"/>
 
 </android.support.v4.widget.NestedScrollView>

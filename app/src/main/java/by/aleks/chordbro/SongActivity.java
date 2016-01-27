@@ -16,7 +16,6 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -50,7 +49,7 @@ public class SongActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         TextView artistTv = (TextView)findViewById(R.id.song_artist);
-        TextView titleTv = (TextView)findViewById(R.id.song_title);
+        DynamicTextView titleTv = (DynamicTextView)findViewById(R.id.song_title);
         artistTv.setText(artist);
         titleTv.setText(title);
         initFavButton(song);
@@ -141,14 +140,6 @@ public class SongActivity extends AppCompatActivity {
         });
         viewPager.setAdapter(pagerAdapter);
 
-    }
-
-    @Override
-    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
-        TextView titleTv = (TextView)findViewById(R.id.song_title);
-        if(titleTv != null)
-            Util.adjustTextSize(titleTv, 24);
-        return super.onCreateView(parent, name, context, attrs);
     }
 
     private int adjustAlpha(int color, float factor) {
