@@ -55,4 +55,12 @@ public class Song extends Model {
                 .orderBy("Timestamp DESC")
                 .execute();
     }
+
+    public static List<Song> getFavorite(){
+        return new Select()
+                .from(Song.class)
+                .where("Favorite = ?", 1)
+                .orderBy("Timestamp DESC")
+                .execute();
+    }
 }

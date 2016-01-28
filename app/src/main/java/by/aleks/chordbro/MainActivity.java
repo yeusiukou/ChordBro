@@ -1,10 +1,18 @@
 package by.aleks.chordbro;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,17 +35,48 @@ public class MainActivity extends AppCompatActivity{
         ActiveAndroid.initialize(this);
 
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-//        loadAndStart("Hello", "Adele", "");
-        recognizer = new Recognizer(this){
+        /*
+        ** SETTING THE UPPER TABS AND SONG LIST FRAGMENTS
+         */
+        final TabLayout tabLayout = (TabLayout) findViewById(R.id.main_tabs);
+        tabLayout.addTab(tabLayout.newTab().setIcon(ContextCompat.getDrawable(this, R.drawable.ic_history_white_24dp)));
+        tabLayout.addTab(tabLayout.newTab().setIcon(ContextCompat.getDrawable(this, R.drawable.ic_favorite_white_24dp)));
+        tabLayout.getTabAt(1).getIcon().setAlpha(150); //Add opacity to the unselected icon
+
+        final ViewPager viewPager = (ViewPager) findViewById(R.id.main_pager);
+        FragmentManager fm = getSupportFragmentManager();
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+
+        FragmentStatePagerAdapter pagerAdapter = new FragmentStatePagerAdapter(fm) {
+            @Override
+            public Fragment getItem(int position) {
+                // Create a fragment with the given type song content
+                return SongListFragment.newInstance(position == 0 ? false : true);
+            }
 
             @Override
-            public void onResult(String title, String artist, String album) {
-                loadAndStart(title, artist, album);
+            public int getCount() {
+                return tabLayout.getTabCount();
             }
         };
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
+                tab.getIcon().setAlpha(255);
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                tab.getIcon().setAlpha(150);
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
+        });
+        viewPager.setAdapter(pagerAdapter);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -46,6 +85,14 @@ public class MainActivity extends AppCompatActivity{
                 new Thread(recognizer).start();
             }
         });
+
+        // Initialise the sound recognising system
+        recognizer = new Recognizer(this){
+            @Override
+            public void onResult(String title, String artist, String album) {
+                loadAndStart(title, artist, album);
+            }
+        };
     }
 
     @Override
