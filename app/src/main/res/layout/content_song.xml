@@ -9,7 +9,7 @@
         android:layout_height="match_parent"
         tools:context="by.aleks.chordbro.SongActivity">
 
-    <by.aleks.chordbro.DynamicTextView
+    <by.aleks.chordbro.views.DynamicTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="@dimen/text_margin"

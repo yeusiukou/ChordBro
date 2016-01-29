@@ -1,6 +1,5 @@
 package by.aleks.chordbro;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -17,15 +16,14 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TabHost;
 import android.widget.TextView;
 import by.aleks.chordbro.data.Content;
 import by.aleks.chordbro.data.Song;
+import by.aleks.chordbro.views.DynamicTextView;
 import com.commit451.nativestackblur.NativeStackBlur;
 import de.hdodenhof.circleimageview.CircleImageView;
 

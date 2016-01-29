@@ -1,4 +1,4 @@
-package by.aleks.chordbro;
+package by.aleks.chordbro.api;
 
 import android.os.AsyncTask;
 import android.util.Log;

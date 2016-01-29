@@ -23,6 +23,33 @@
                 app:tabMode="fixed" android:layout_alignParentBottom="true"
                 android:layout_alignParentLeft="true" android:layout_alignParentStart="true"/>
 
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+            <by.aleks.chordbro.views.VisualizerView
+                    android:id="@+id/visualizer"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginBottom="15dp"/>
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:textSize="21sp"
+                    android:textColor="#FFFFFF"
+                    android:alpha="0.7"
+                    android:text="@string/listening"
+                    android:textAlignment="center"
+                    android:fontFamily="sans-serif-light"/>
+        </LinearLayout>
+
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v4.view.ViewPager

@@ -1,4 +1,4 @@
-package by.aleks.chordbro;
+package by.aleks.chordbro.views;
 
 import android.content.Context;
 import android.graphics.Paint;

@@ -1,6 +1,5 @@
 package by.aleks.chordbro;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -11,12 +10,11 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
+import by.aleks.chordbro.api.LastfmImageLoader;
+import by.aleks.chordbro.api.Recognizer;
 import by.aleks.chordbro.data.Artist;
 import by.aleks.chordbro.data.Content;
 import by.aleks.chordbro.data.Song;

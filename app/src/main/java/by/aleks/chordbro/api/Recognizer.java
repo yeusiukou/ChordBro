@@ -1,9 +1,8 @@
-package by.aleks.chordbro;
+package by.aleks.chordbro.api;
 
 import android.app.Activity;
 import android.util.Log;
-import by.aleks.chordbro.data.Artist;
-import by.aleks.chordbro.data.Song;
+import by.aleks.chordbro.R;
 import com.gracenote.gnsdk.*;
 
 import java.util.ArrayList;
@@ -59,13 +58,14 @@ public class Recognizer implements Runnable {
             // - configure
             // Starting and stopping continuous listening should be started and stopped
             // based on Activity life-cycle, see onPause and onResume for details
-            gnMicrophone = new GnMic();
-            gnMusicIdStream = new GnMusicIdStream( gnUser, GnMusicIdStreamPreset.kPresetMicrophone, new MusicIDStreamEvents() );
+            gnMicrophone = new AudioVisualizeAdapter(new GnMic(), activity);
+            gnMusicIdStream = new GnMusicIdStream( gnUser, GnMusicIdStreamPreset.kPresetMicrophone, new MusicIDStreamEvents());
             gnMusicIdStream.options().lookupData(GnLookupData.kLookupDataContent, true);
             gnMusicIdStream.options().lookupData(GnLookupData.kLookupDataSonicData, true);
             gnMusicIdStream.options().resultSingle(true);
             // Retain GnMusicIdStream object so we can cancel an active identification if requested
             streamIdObjects.add( gnMusicIdStream );
+
 
         } catch ( GnException e ) {
 
