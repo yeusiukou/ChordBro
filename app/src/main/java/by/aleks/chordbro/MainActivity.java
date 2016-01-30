@@ -1,6 +1,9 @@
 package by.aleks.chordbro;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -10,14 +13,26 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import by.aleks.chordbro.api.LastfmImageLoader;
 import by.aleks.chordbro.api.Recognizer;
 import by.aleks.chordbro.data.Artist;
 import by.aleks.chordbro.data.Content;
 import by.aleks.chordbro.data.Song;
+import by.aleks.chordbro.views.BackButtonListener;
+import by.aleks.chordbro.views.SearchInput;
+import by.aleks.chordbro.views.VisualizerView;
 import com.activeandroid.ActiveAndroid;
 
 import java.util.Map;
@@ -26,6 +41,13 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity{
 
     private Recognizer recognizer;
+    private TabLayout tabLayout;
+    private LinearLayout searchBar;
+    private LinearLayout recognizerLayout;
+    private VisualizerView visualizerView;
+    private ImageView backButton;
+    private SearchInput input;
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,11 +55,11 @@ public class MainActivity extends AppCompatActivity{
         ActiveAndroid.initialize(this);
 
         setContentView(R.layout.activity_main);
-
+        initSearchBar();
         /*
         ** SETTING THE UPPER TABS AND SONG LIST FRAGMENTS
          */
-        final TabLayout tabLayout = (TabLayout) findViewById(R.id.main_tabs);
+        tabLayout = (TabLayout) findViewById(R.id.main_tabs);
         tabLayout.addTab(tabLayout.newTab().setIcon(ContextCompat.getDrawable(this, R.drawable.ic_history_white_24dp)));
         tabLayout.addTab(tabLayout.newTab().setIcon(ContextCompat.getDrawable(this, R.drawable.ic_favorite_white_24dp)));
         tabLayout.getTabAt(1).getIcon().setAlpha(150); //Add opacity to the unselected icon
@@ -50,7 +72,7 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public Fragment getItem(int position) {
                 // Create a fragment with the given type song content
-                return SongListFragment.newInstance(position == 0 ? false : true);
+                return SongListFragment.newInstance(position != 0);
             }
 
             @Override
@@ -76,10 +98,11 @@ public class MainActivity extends AppCompatActivity{
         });
         viewPager.setAdapter(pagerAdapter);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                revealSearchBar();
                 new Thread(recognizer).start();
             }
         });
@@ -190,4 +213,77 @@ public class MainActivity extends AppCompatActivity{
         startActivity(songIntent);
     }
 
+    private void initSearchBar(){
+        searchBar = (LinearLayout)findViewById(R.id.searchbar);
+        recognizerLayout = (LinearLayout)findViewById(R.id.recognizer_layout);
+        backButton = (ImageView)findViewById(R.id.search_back_button);
+        visualizerView = (VisualizerView)findViewById(R.id.visualizer);
+
+        input = (SearchInput)findViewById(R.id.search_input);
+        input.getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP); // Make the underline white
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hideSearchBar();
+            }
+        });
+        //TODO: Stop recognition, when user starts typing
+        input.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                recognizerLayout.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+    }
+
+    private void revealSearchBar(){
+        tabLayout.setVisibility(View.GONE);
+        searchBar.setVisibility(View.VISIBLE);
+        visualizerView.resetAnimation();
+        fab.setVisibility(View.GONE);
+
+        input.requestFocus();
+        // Custom listener as onBackPressed() is not called when the keyboard is shown
+        input.setBackButtonListener(new BackButtonListener() {
+            @Override
+            public void onBackButtonPressed() {
+                hideSearchBar();
+            }
+        });
+        // Show keyboard
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
+
+        recognizerLayout.setVisibility(View.VISIBLE);
+    }
+
+    public void hideSearchBar(){
+        searchBar.setVisibility(View.GONE);
+        recognizerLayout.setVisibility(View.GONE);
+        tabLayout.setVisibility(View.VISIBLE);
+
+        input.setText("");
+        // Hide keyboard
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(input.getWindowToken(), 0);
+        fab.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(searchBar.getVisibility() == View.VISIBLE)
+            hideSearchBar();
+        else super.onBackPressed();
+    }
 }

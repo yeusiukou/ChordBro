@@ -52,8 +52,10 @@ public class SongListFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Song song = songList.get(i);
-                if (song.chordcount > 0)
+                if (song.chordcount > 0) {
+                    ((MainActivity) getActivity()).hideSearchBar();
                     ((MainActivity) getActivity()).startSongActivity(song.title, song.artist.name);
+                }
                 else Toast.makeText(getActivity(), getString(R.string.no_chords), Toast.LENGTH_SHORT).show();
             }
         });
