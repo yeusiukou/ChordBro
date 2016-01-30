@@ -22,6 +22,7 @@ public class Recognizer implements Runnable {
     private GnMusicIdStream gnMusicIdStream;
     private IGnAudioSource gnMicrophone;
     private List<GnMusicIdStream> streamIdObjects = new ArrayList<>();
+    private boolean isProcessing;
 
     private Activity activity;
 
@@ -120,6 +121,7 @@ public class Recognizer implements Runnable {
                     }
                 }
             }).start();
+            isProcessing = true;
         }
     }
 
@@ -140,8 +142,23 @@ public class Recognizer implements Runnable {
             } catch (GnException e) {
 
                 Log.e(TAG, e.errorCode() + ", " + e.errorDescription() + ", " + e.errorModule());
+            } finally {
+                isProcessing = false;
             }
         }
+    }
+
+    public boolean isProcessing(){
+        return isProcessing;
+    }
+
+    public void cancelId(){
+        if ( gnMusicIdStream != null )
+            try {
+                gnMusicIdStream.identifyCancel();
+            } catch (GnException e) {
+                e.printStackTrace();
+            }
     }
 
     /**
@@ -256,7 +273,7 @@ public class Recognizer implements Runnable {
         }
     }
 
-    private void notify(String text){
+    public void notify(String text){
         Log.d(TAG, text);
     }
 }

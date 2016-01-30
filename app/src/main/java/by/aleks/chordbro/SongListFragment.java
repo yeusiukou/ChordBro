@@ -2,13 +2,11 @@ package by.aleks.chordbro;
 
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 import by.aleks.chordbro.data.Song;
 
 import java.util.List;
@@ -52,11 +50,7 @@ public class SongListFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Song song = songList.get(i);
-                if (song.chordcount > 0) {
-                    ((MainActivity) getActivity()).hideSearchBar();
-                    ((MainActivity) getActivity()).startSongActivity(song.title, song.artist.name);
-                }
-                else Toast.makeText(getActivity(), getString(R.string.no_chords), Toast.LENGTH_SHORT).show();
+                ((MainActivity)getActivity()).openSong(song.title, song.artist.name);
             }
         });
         songListView.setDivider(null);

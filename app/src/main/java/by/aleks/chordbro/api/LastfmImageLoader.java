@@ -132,7 +132,7 @@ public class LastfmImageLoader extends AsyncTask<String, Void, byte[]> {
             }
             return output.toByteArray();
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            e.printStackTrace();
             return null;
         } finally {
             try {

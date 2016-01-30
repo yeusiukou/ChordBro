@@ -52,8 +52,11 @@ public class SongAdapter extends ArrayAdapter<Song> {
 
             if (image != null){
                 byte[] byteArray = currentSong.artist.image;
-                Bitmap bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
-                image.setImageBitmap(bmp);
+                //TODO: Add a blank image
+                if(byteArray != null){
+                    Bitmap bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+                    image.setImageBitmap(bmp);
+                }
 
             if (title != null)
                 title.setText(currentSong.title);

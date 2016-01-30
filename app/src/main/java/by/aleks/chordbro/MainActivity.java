@@ -1,9 +1,6 @@
 package by.aleks.chordbro;
 
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -13,41 +10,27 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.*;
 import by.aleks.chordbro.api.LastfmImageLoader;
 import by.aleks.chordbro.api.Recognizer;
 import by.aleks.chordbro.data.Artist;
 import by.aleks.chordbro.data.Content;
 import by.aleks.chordbro.data.Song;
-import by.aleks.chordbro.views.BackButtonListener;
-import by.aleks.chordbro.views.SearchInput;
-import by.aleks.chordbro.views.VisualizerView;
+import by.aleks.chordbro.views.SearchLayout;
 import com.activeandroid.ActiveAndroid;
 
 import java.util.Map;
 
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity implements LayoutCommunicator {
 
     private Recognizer recognizer;
     private TabLayout tabLayout;
-    private LinearLayout searchBar;
-    private LinearLayout recognizerLayout;
-    private VisualizerView visualizerView;
-    private ImageView backButton;
-    private SearchInput input;
     private FloatingActionButton fab;
+    private SearchLayout searchLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +38,9 @@ public class MainActivity extends AppCompatActivity{
         ActiveAndroid.initialize(this);
 
         setContentView(R.layout.activity_main);
-        initSearchBar();
+        searchLayout = (SearchLayout)findViewById(R.id.search_layout);
+        searchLayout.init();
+        searchLayout.setLayoutCommunicator(this);
         /*
         ** SETTING THE UPPER TABS AND SONG LIST FRAGMENTS
          */
@@ -102,13 +87,26 @@ public class MainActivity extends AppCompatActivity{
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                revealSearchBar();
+                searchLayout.reveal();
                 new Thread(recognizer).start();
             }
         });
 
         // Initialise the sound recognising system
         recognizer = new Recognizer(this){
+            @Override
+            public void notify(String text) {
+                super.notify(text);
+                final String sText = text;
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        searchLayout.updateStatus(sText);
+                        searchLayout.hide();
+                    }
+                });
+            }
+
             @Override
             public void onResult(String title, String artist, String album) {
                 loadAndStart(title, artist, album);
@@ -119,7 +117,7 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onResume() {
         super.onResume();
-        if(recognizer!=null)
+        if(!recognizer.isProcessing())
             recognizer.startAudioProcess();
     }
 
@@ -152,11 +150,24 @@ public class MainActivity extends AppCompatActivity{
         return super.onOptionsItemSelected(item);
     }
 
+    public void openSong(String title, String artistName){
+        Song song = Song.find(title, artistName);
+        if (song.chordcount > 0) {
+            searchLayout.hide();
+
+            Intent songIntent = new Intent().setClassName(MainActivity.this, "by.aleks.chordbro.SongActivity");
+            songIntent.putExtra(getString(R.string.artist_key), artistName);
+            songIntent.putExtra(getString(R.string.title_key), title);
+            startActivity(songIntent);
+        }
+        else Toast.makeText(this, getString(R.string.no_chords), Toast.LENGTH_SHORT).show();
+    }
+
     private void loadAndStart(final String title, final String artistName, final String album){
 
         // If the song already exists in db, don't load anything
         if(Song.find(title, artistName) != null){
-            startSongActivity(title, artistName);
+            openSong(title, artistName);
             return;
         }
 
@@ -172,12 +183,12 @@ public class MainActivity extends AppCompatActivity{
                     artist.save();
 
                     addSongToDb(title, artist, album);
-                    startSongActivity(title, artistName);
+                    openSong(title, artistName);
                 }
             }.execute(artistName);
         } else {
             addSongToDb(title, artist, album);
-            startSongActivity(title, artistName);
+            openSong(title, artistName);
         }
     }
 
@@ -201,89 +212,34 @@ public class MainActivity extends AppCompatActivity{
                     song.chordcount++; //Increase the number of chord types
                     song.save();
                 }
-                startSongActivity(title, artist.name);
+                openSong(title, artist.name);
             }
         }.execute(artist.name, title);
     }
 
-    public void startSongActivity(String title, String artistName){
-        Intent songIntent = new Intent().setClassName(MainActivity.this, "by.aleks.chordbro.SongActivity");
-        songIntent.putExtra(getString(R.string.artist_key), artistName);
-        songIntent.putExtra(getString(R.string.title_key), title);
-        startActivity(songIntent);
+    @Override
+    public void onBackPressed() {
+        if(searchLayout.isRevealed()){
+            searchLayout.hide();
+        }
+        else super.onBackPressed();
     }
 
-    private void initSearchBar(){
-        searchBar = (LinearLayout)findViewById(R.id.searchbar);
-        recognizerLayout = (LinearLayout)findViewById(R.id.recognizer_layout);
-        backButton = (ImageView)findViewById(R.id.search_back_button);
-        visualizerView = (VisualizerView)findViewById(R.id.visualizer);
-
-        input = (SearchInput)findViewById(R.id.search_input);
-        input.getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP); // Make the underline white
-
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                hideSearchBar();
-            }
-        });
-        //TODO: Stop recognition, when user starts typing
-        input.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                recognizerLayout.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-    }
-
-    private void revealSearchBar(){
-        tabLayout.setVisibility(View.GONE);
-        searchBar.setVisibility(View.VISIBLE);
-        visualizerView.resetAnimation();
+    /*
+    Show and hide the FAB and Tab with the search layout.
+     */
+    @Override
+    public void onLayoutShow() {
         fab.setVisibility(View.GONE);
-
-        input.requestFocus();
-        // Custom listener as onBackPressed() is not called when the keyboard is shown
-        input.setBackButtonListener(new BackButtonListener() {
-            @Override
-            public void onBackButtonPressed() {
-                hideSearchBar();
-            }
-        });
-        // Show keyboard
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
-
-        recognizerLayout.setVisibility(View.VISIBLE);
-    }
-
-    public void hideSearchBar(){
-        searchBar.setVisibility(View.GONE);
-        recognizerLayout.setVisibility(View.GONE);
-        tabLayout.setVisibility(View.VISIBLE);
-
-        input.setText("");
-        // Hide keyboard
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(input.getWindowToken(), 0);
-        fab.setVisibility(View.VISIBLE);
+        tabLayout.setVisibility(View.GONE);
     }
 
     @Override
-    public void onBackPressed() {
-        if(searchBar.getVisibility() == View.VISIBLE)
-            hideSearchBar();
-        else super.onBackPressed();
+    public void onLayoutHide() {
+        fab.setVisibility(View.VISIBLE);
+        tabLayout.setVisibility(View.VISIBLE);
+
+        if(recognizer!=null)
+            recognizer.cancelId();
     }
 }
