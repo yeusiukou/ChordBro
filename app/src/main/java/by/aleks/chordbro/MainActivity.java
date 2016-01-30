@@ -31,6 +31,8 @@ public class MainActivity extends AppCompatActivity implements LayoutCommunicato
     private TabLayout tabLayout;
     private FloatingActionButton fab;
     private SearchLayout searchLayout;
+    private SongListFragment recentFragment;
+    private SongListFragment favoriteFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,11 +55,15 @@ public class MainActivity extends AppCompatActivity implements LayoutCommunicato
         FragmentManager fm = getSupportFragmentManager();
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
 
+        recentFragment = SongListFragment.newInstance(false);
+        favoriteFragment = SongListFragment.newInstance((true));
         FragmentStatePagerAdapter pagerAdapter = new FragmentStatePagerAdapter(fm) {
             @Override
             public Fragment getItem(int position) {
                 // Create a fragment with the given type song content
-                return SongListFragment.newInstance(position != 0);
+                if(position == 0)
+                    return  recentFragment;
+                else return favoriteFragment;
             }
 
             @Override
@@ -150,17 +156,20 @@ public class MainActivity extends AppCompatActivity implements LayoutCommunicato
         return super.onOptionsItemSelected(item);
     }
 
-    public void openSong(String title, String artistName){
+    public void openSong(String title, String artistName) {
         Song song = Song.find(title, artistName);
-        if (song.chordcount > 0) {
-            searchLayout.hide();
 
-            Intent songIntent = new Intent().setClassName(MainActivity.this, "by.aleks.chordbro.SongActivity");
-            songIntent.putExtra(getString(R.string.artist_key), artistName);
-            songIntent.putExtra(getString(R.string.title_key), title);
-            startActivity(songIntent);
-        }
-        else Toast.makeText(this, getString(R.string.no_chords), Toast.LENGTH_SHORT).show();
+        if (song.chordcount < 1)
+            return;
+
+        searchLayout.hide();
+
+        Intent songIntent = new Intent().setClassName(MainActivity.this, "by.aleks.chordbro.SongActivity");
+        songIntent.putExtra(getString(R.string.artist_key), artistName);
+        songIntent.putExtra(getString(R.string.title_key), title);
+        startActivity(songIntent);
+
+
     }
 
     private void loadAndStart(final String title, final String artistName, final String album){
@@ -182,17 +191,15 @@ public class MainActivity extends AppCompatActivity implements LayoutCommunicato
                     artist.image = bytes;
                     artist.save();
 
-                    addSongToDb(title, artist, album);
-                    openSong(title, artistName);
+                    addSongToDbAndOpen(title, artist, album);
                 }
             }.execute(artistName);
         } else {
-            addSongToDb(title, artist, album);
-            openSong(title, artistName);
+            addSongToDbAndOpen(title, artist, album);
         }
     }
 
-    private void addSongToDb(final String title, final Artist artist, final String album){
+    private void addSongToDbAndOpen(final String title, final Artist artist, final String album){
         final Song song = new Song();
         song.artist = artist;
         song.title = title;
@@ -212,6 +219,7 @@ public class MainActivity extends AppCompatActivity implements LayoutCommunicato
                     song.chordcount++; //Increase the number of chord types
                     song.save();
                 }
+                recentFragment.refresh();
                 openSong(title, artist.name);
             }
         }.execute(artist.name, title);

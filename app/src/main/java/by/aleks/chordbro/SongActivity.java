@@ -60,9 +60,11 @@ public class SongActivity extends AppCompatActivity {
         final ImageView artistBackground = (ImageView)findViewById(R.id.artist_background);
         final CircleImageView artistImage = (CircleImageView)findViewById(R.id.artist_image);
         byte[] byteArray = song.artist.image;
-        Bitmap bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
-        artistImage.setImageBitmap(bmp);
-        artistBackground.setImageBitmap(NativeStackBlur.process(bmp, 3));
+        if(byteArray != null){
+            Bitmap bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+            artistImage.setImageBitmap(bmp);
+            artistBackground.setImageBitmap(NativeStackBlur.process(bmp, 3));
+        }
 
         final TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         final LinearLayout icons = (LinearLayout)findViewById(R.id.icons);

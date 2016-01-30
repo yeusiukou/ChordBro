@@ -104,6 +104,8 @@ public class SongContentLoader extends AsyncTask<String, Void, Map<String, Strin
     }
 
     private Map loadSongSpannable(String artist, String title){
+        artist = artist.replace(" ", "+");
+        title = title.replace(" ", "+");
         String songUrl = "http://app.ultimate-guitar.com/search.php?search_type=title&page=1&iphone=1&value="+artist+"+"+title;
         Document song = parseXML(loadSongText(songUrl));
         NodeList songList = song.getElementsByTagName("result");
