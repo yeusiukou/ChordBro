@@ -3,6 +3,7 @@ package by.aleks.chordbro;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,6 +47,8 @@ public class SongAdapter extends ArrayAdapter<Song> {
             TextView album = (TextView) view.findViewById(R.id.item_album);
             TextView time = (TextView) view.findViewById(R.id.item_time);
             CircleImageView image = (CircleImageView) view.findViewById(R.id.item_image);
+            View favicon = view.findViewById(R.id.item_favorite);
+            View noChords = view.findViewById(R.id.item_no_chords);
 
             if (artist != null)
                 artist.setText(currentSong.artist.name);
@@ -56,7 +59,7 @@ public class SongAdapter extends ArrayAdapter<Song> {
                 if(byteArray != null){
                     Bitmap bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
                     image.setImageBitmap(bmp);
-                }
+                } else image.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.vinyl));
 
             if (title != null)
                 title.setText(currentSong.title);
@@ -69,12 +72,12 @@ public class SongAdapter extends ArrayAdapter<Song> {
             time.setText(dateToString(currentSong.timestamp));
 
             // display icons
-            View favicon = view.findViewById(R.id.item_favorite);
+            favicon.setVisibility(View.INVISIBLE); // Hide both of the icons before
+            noChords.setVisibility(View.INVISIBLE);
             if(currentSong.chordcount == 0)
-                view.findViewById(R.id.item_no_chords).setVisibility(View.VISIBLE);
+                noChords.setVisibility(View.VISIBLE);
             else if(currentSong.favorite)
                 favicon.setVisibility(View.VISIBLE);
-            else favicon.setVisibility(View.INVISIBLE);
         }
 
         return view;
