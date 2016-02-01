@@ -197,16 +197,6 @@ public class Recognizer implements Runnable {
      */
     private class MusicIDStreamEvents implements IGnMusicIdStreamEvents {
 
-        HashMap<String, String> gnStatus_to_displayStatus;
-
-        public MusicIDStreamEvents(){
-            gnStatus_to_displayStatus = new HashMap<>();
-            gnStatus_to_displayStatus.put(GnMusicIdStreamIdentifyingStatus.kStatusIdentifyingStarted.toString(), "Identification started");
-            gnStatus_to_displayStatus.put(GnMusicIdStreamIdentifyingStatus.kStatusIdentifyingFpGenerated.toString(), "Fingerprinting complete");
-            gnStatus_to_displayStatus.put(GnMusicIdStreamIdentifyingStatus.kStatusIdentifyingLocalQueryStarted.toString(), "Lookup started");
-            gnStatus_to_displayStatus.put(GnMusicIdStreamIdentifyingStatus.kStatusIdentifyingOnlineQueryStarted.toString(), "Lookup started");
-        }
-
         @Override
         public void statusEvent( GnStatus status, long percentComplete, long bytesTotalSent, long bytesTotalReceived, IGnCancellable cancellable ) {}
 
@@ -233,15 +223,17 @@ public class Recognizer implements Runnable {
             try {
                 if (result.resultCount() == 0) {
 
-                    Recognizer.this.notify("No match");
-                    if(times < 4){
-                        new Thread(new Recognizer(activity)).start();
+                    if(times < 3){
+                        gnMusicIdStream.identifyAlbumAsync();
                         times++;
-                    } else times = 0;
+                    } else {
+                        times = 0;
+                        Recognizer.this.notify(activity.getString(R.string.no_match));
+                    }
 
                 } else {
 
-                    Recognizer.this.notify("Match found");
+                    Recognizer.this.notify(activity.getString(R.string.match_found));
                     GnAlbumIterator iter = result.albums().getIterator();
                     if (iter.hasNext()) {
                         final GnAlbum album = iter.next();
