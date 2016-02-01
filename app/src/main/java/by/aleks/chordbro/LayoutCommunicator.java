@@ -7,4 +7,5 @@ public interface LayoutCommunicator {
 
     public abstract void onLayoutShow();
     public abstract void onLayoutHide();
+    public abstract void onType();
 }

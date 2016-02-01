@@ -250,4 +250,10 @@ public class MainActivity extends AppCompatActivity implements LayoutCommunicato
         if(recognizer!=null)
             recognizer.cancelId();
     }
+
+    @Override
+    public void onType() {
+        if(recognizer!=null)
+            recognizer.cancelId();
+    }
 }

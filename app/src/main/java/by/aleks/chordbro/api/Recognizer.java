@@ -267,7 +267,7 @@ public class Recognizer implements Runnable {
         public void musicIdStreamIdentifyCompletedWithError(GnError error) {
             //TODO: notify about connection problem
             if ( error.isCancelled() )
-                Recognizer.this.notify("Cancelled");
+                Log.d(TAG, "Cancelled");
             else
                 Recognizer.this.notify(error.errorDescription());
         }

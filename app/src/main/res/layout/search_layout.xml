@@ -33,6 +33,7 @@
                 android:hint="@string/search"
                 android:textColor="@color/white"
                 android:alpha="0.5"
+                android:textCursorDrawable="@null"
                 android:fontFamily="sans-serif-light"
                 android:inputType="textNoSuggestions"
                 android:drawableRight="@drawable/ic_search_white_24dp"/>

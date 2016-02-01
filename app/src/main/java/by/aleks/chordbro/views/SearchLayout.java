@@ -61,6 +61,7 @@ public class SearchLayout extends LinearLayout {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 recognizerLayout.setVisibility(View.GONE);
+                communicator.onType();
             }
 
             @Override
