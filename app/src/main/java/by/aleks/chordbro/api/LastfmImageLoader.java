@@ -19,7 +19,7 @@ public class LastfmImageLoader extends AsyncTask<String, Void, byte[]> {
     @Override
     protected byte[] doInBackground(String... strings) {
         return loadBinary(getImageUrl(loadUrl("http://ws.audioscrobbler.com/2.0/?method=artist.getInfo&artist="
-                + strings[0].replace(" ", "+") //artist name
+                + strings[0].replace("+", "%2B").replace(" ", "+") //artist name
                 + "&format=json&api_key=" + LAST_FM_KEY)));
     }
 

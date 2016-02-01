@@ -219,8 +219,9 @@ public class MainActivity extends AppCompatActivity implements LayoutCommunicato
                     song.chordcount++; //Increase the number of chord types
                     song.save();
                 }
-                recentFragment.refresh();
-                openSong(title, artist.name);
+                if(resultMap.size() > 0)
+                    openSong(title, artist.name);
+                else recentFragment.refresh(); // if no chords for the song just refresh the list
             }
         }.execute(artist.name, title);
     }
