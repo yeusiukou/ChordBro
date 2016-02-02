@@ -1,5 +1,6 @@
 package by.aleks.chordbro;
 
+import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -39,9 +40,19 @@ public class SongListFragment extends Fragment {
 
     public void refresh(){
         if(songList != null){
-            songList.clear();
-            songList.addAll(isFavorite ? Song.getFavorite() : Song.getAll());
-            adapter.notifyDataSetChanged();
+            // Get the song list in the background thread and when it's done update the view
+            new AsyncTask<Void, Void, Void>(){
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    songList.clear();
+                    songList.addAll(isFavorite ? Song.getFavorite() : Song.getAll());
+                    return null;
+                }
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                    adapter.notifyDataSetChanged();
+                }
+            }.execute();
         }
     }
 
@@ -50,22 +61,34 @@ public class SongListFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
 
         isFavorite = getArguments().getBoolean(FAV_PARAM);
-        songList = isFavorite ? Song.getFavorite() : Song.getAll();
 
-        adapter = new SongAdapter(getActivity(), R.layout.song_list_item, songList);
-        final ListView songListView = (ListView) rootView.findViewById(R.id.song_list_view);
-        songListView.setAdapter(adapter);
-        songListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        // Get the song list in the background thread and when it's done assign it to the adapter
+        new AsyncTask<Void, Void, Void>(){
+            @Override
+            protected Void doInBackground(Void... voids) {
+                songList = isFavorite ? Song.getFavorite() : Song.getAll();
+                return null;
+            }
 
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Song song = songList.get(i);
-                if(song.chordcount > 0)
-                    ((MainActivity)getActivity()).openSong(song.title, song.artist.name);
-                else Toast.makeText(getContext(), getString(R.string.no_chords), Toast.LENGTH_SHORT).show();
+            protected void onPostExecute(Void aVoid) {
+                adapter = new SongAdapter(getActivity(), R.layout.song_list_item, songList);
+                final ListView songListView = (ListView) rootView.findViewById(R.id.song_list_view);
+                songListView.setAdapter(adapter);
+                songListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        Song song = songList.get(i);
+                        if(song.chordcount > 0)
+                            ((MainActivity)getActivity()).openSong(song.title, song.artist.name);
+                        else Toast.makeText(getContext(), getString(R.string.no_chords), Toast.LENGTH_SHORT).show();
+                    }
+                });
+                songListView.setDivider(null);
             }
-        });
-        songListView.setDivider(null);
+        }.execute();
+
         return rootView;
     }
 
