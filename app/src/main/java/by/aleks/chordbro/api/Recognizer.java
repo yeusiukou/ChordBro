@@ -153,7 +153,7 @@ public class Recognizer implements Runnable {
     }
 
     public void cancelId(){
-        if ( gnMusicIdStream != null )
+        if ( gnMusicIdStream != null && isProcessing())
             try {
                 gnMusicIdStream.identifyCancel();
             } catch (GnException e) {

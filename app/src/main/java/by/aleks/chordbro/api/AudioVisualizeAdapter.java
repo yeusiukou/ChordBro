@@ -73,7 +73,7 @@ class AudioVisualizeAdapter implements IGnAudioSource {
 
         long numBytes = audioSource.getData(buffer, bufferSize);
 
-        if ( numBytes != 0 ) {
+        if ( numBytes > 0 ) {
             final byte[] bytes = new byte[(int)numBytes];
             for (int i=0; i<numBytes; i++){
                 bytes[i] = buffer.get();

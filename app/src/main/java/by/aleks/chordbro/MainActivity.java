@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,6 +23,7 @@ import by.aleks.chordbro.data.Song;
 import by.aleks.chordbro.views.SearchLayout;
 import com.activeandroid.ActiveAndroid;
 
+import java.util.Date;
 import java.util.Map;
 
 
@@ -102,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements LayoutCommunicato
         recognizer = new Recognizer(this){
             @Override
             public void notify(String text) {
-                super.notify(text);
+                Log.d("Recognizer", text);
                 final String sText = text;
                 MainActivity.this.runOnUiThread(new Runnable() {
                     @Override
@@ -132,6 +134,8 @@ public class MainActivity extends AppCompatActivity implements LayoutCommunicato
         super.onPause();
         if(recognizer!=null)
             recognizer.stopAudioProcess();
+        if(searchLayout!=null)
+            searchLayout.hide();
     }
 
     @Override
@@ -174,9 +178,14 @@ public class MainActivity extends AppCompatActivity implements LayoutCommunicato
 
     private void loadAndStart(final String title, final String artistName, final String album){
 
-        // If the song already exists in db, don't load anything
-        if(Song.find(title, artistName) != null){
-            openSong(title, artistName);
+        // If the song already exists in db, just update the timestamp
+        Song song = Song.find(title, artistName);
+        if(song != null){
+            song.timestamp = new Date();
+            song.save();
+            if(song.chordcount == 0)
+                recentFragment.refresh();
+            else openSong(title, artistName);
             return;
         }
 
