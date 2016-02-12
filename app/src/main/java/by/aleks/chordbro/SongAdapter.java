@@ -12,11 +12,13 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import by.aleks.chordbro.data.Content;
 import by.aleks.chordbro.data.Song;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Alex on 1/25/16.
@@ -60,7 +62,7 @@ public class SongAdapter extends ArrayAdapter<Song> {
 
             if (image != null){
                 byte[] byteArray = currentSong.artist.image;
-                //TODO: Add a blank image
+                // Add a blank image
                 if(byteArray != null){
                     Bitmap bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
                     image.setImageBitmap(bmp);

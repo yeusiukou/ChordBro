@@ -18,7 +18,7 @@ public class Song extends Model {
     @Column(name = "Title", notNull = true)
     public String title;
 
-    @Column(name = "Artist", notNull = true)
+    @Column(name = "Artist", notNull = true, onDelete = Column.ForeignKeyAction.CASCADE)
     public Artist artist;
 
     @Column(name = "Album")

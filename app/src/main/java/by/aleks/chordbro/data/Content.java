@@ -17,7 +17,7 @@ import java.util.Map;
 @Table(name = "Contents")
 public class Content extends Model {
 
-    @Column(name = "Song")
+    @Column(name = "Song", onDelete = Column.ForeignKeyAction.CASCADE)
     public Song song;
 
     @Column(name = "Instrument")

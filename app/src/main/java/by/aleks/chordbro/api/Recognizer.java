@@ -5,8 +5,8 @@ import android.util.Log;
 import by.aleks.chordbro.R;
 import com.gracenote.gnsdk.*;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -15,6 +15,7 @@ import java.util.List;
 public class Recognizer implements Runnable {
 
     private static String TAG = "Recognizer";
+    private Activity activity;
 
     // Gracenote objects
     private GnManager gnManager;
@@ -22,9 +23,10 @@ public class Recognizer implements Runnable {
     private GnMusicIdStream gnMusicIdStream;
     private IGnAudioSource gnMicrophone;
     private List<GnMusicIdStream> streamIdObjects = new ArrayList<>();
-    private boolean isProcessing;
 
-    private Activity activity;
+    //flags
+    private boolean isProcessing;
+    private int failCount = 0;
 
     public Recognizer(Activity activity){
 
@@ -91,7 +93,17 @@ public class Recognizer implements Runnable {
     @Override
     public void run() {
         try {
-            gnMusicIdStream.identifyAlbumAsync();
+            if(isInternetAvailable()){
+                gnMusicIdStream.identifyAlbumAsync();
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        onStart();
+                    }
+                });
+            }
+            else callUIError(activity.getString(R.string.connection_error));
+
         } catch (GnException e) {
             e.printStackTrace();
         }
@@ -103,6 +115,12 @@ public class Recognizer implements Runnable {
      * @param artist - name of the artist
      */
     public void onResult(String title, String artist, String album){};
+
+    public void onError(String error){};
+
+    public void onStart(){};
+
+
 
     public void startAudioProcess() {
 
@@ -201,14 +219,7 @@ public class Recognizer implements Runnable {
         public void statusEvent( GnStatus status, long percentComplete, long bytesTotalSent, long bytesTotalReceived, IGnCancellable cancellable ) {}
 
         @Override
-        public void musicIdStreamProcessingStatusEvent( GnMusicIdStreamProcessingStatus status, IGnCancellable canceller ) {
-
-            if(GnMusicIdStreamProcessingStatus.kStatusProcessingAudioStarted.compareTo(status) == 0)
-            {
-                //TODO: notify that process started
-            }
-
-        }
+        public void musicIdStreamProcessingStatusEvent( GnMusicIdStreamProcessingStatus status, IGnCancellable canceller ) {}
 
         @Override
         public void musicIdStreamIdentifyingStatusEvent( GnMusicIdStreamIdentifyingStatus status, IGnCancellable canceller ) {}
@@ -217,33 +228,27 @@ public class Recognizer implements Runnable {
         /**
          * When the song is found send it to onPostExecute()
          */
-        private int times = 0;
         @Override
         public void musicIdStreamAlbumResult( GnResponseAlbums result, IGnCancellable canceller ) {
             try {
                 if (result.resultCount() == 0) {
-
-                    if(times < 3){
-                        gnMusicIdStream.identifyAlbumAsync();
-                        times++;
-                    } else {
-                        times = 0;
-                        Recognizer.this.notify(activity.getString(R.string.no_match));
-                    }
-
+                    tryAgain();
                 } else {
 
-                    Recognizer.this.notify(activity.getString(R.string.match_found));
                     GnAlbumIterator iter = result.albums().getIterator();
                     if (iter.hasNext()) {
                         final GnAlbum album = iter.next();
-                        activity.runOnUiThread(new Runnable() {
+
+                        final String title = album.trackMatched().title().display();
+                        final String artistName = album.artist().name().display();
+                        final String albumName = album.title().display();
+
+                        if( (title == null | title.equals("")) || (artistName == null | artistName.equals("")) )
+                            tryAgain();
+                        else activity.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Recognizer.this.onResult(
-                                        album.trackMatched().title().display(), // song title
-                                        album.artist().name().display(), // artist name
-                                        album.title().display()); // album name
+                                Recognizer.this.onResult(title, artistName, albumName);
                             }
                         });
                     }
@@ -256,16 +261,52 @@ public class Recognizer implements Runnable {
         }
 
         @Override
-        public void musicIdStreamIdentifyCompletedWithError(GnError error) {
-            //TODO: notify about connection problem
+        public void musicIdStreamIdentifyCompletedWithError(final GnError error) {
+            // notify about connection problem
             if ( error.isCancelled() )
                 Log.d(TAG, "Cancelled");
-            else
-                Recognizer.this.notify(error.errorDescription());
+            else callUIError(activity.getString(R.string.server_error));
         }
     }
 
     public void notify(String text){
         Log.d(TAG, text);
+    }
+
+    public boolean isInternetAvailable() {
+        try {
+            InetAddress ipAddr = InetAddress.getByName("google.com"); //You can replace it with your name
+
+            if (ipAddr.equals("")) {
+                return false;
+            } else {
+                return true;
+            }
+
+        } catch (Exception e) {
+            return false;
+        }
+
+    }
+
+    private void callUIError(final String message){
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                onError(message);
+            }
+        });
+    }
+
+    // Notify if recognition fails 3 times
+    private void tryAgain() throws GnException {
+        if(failCount < 3){
+            Log.d(TAG, "Failed "+failCount+" time");
+            gnMusicIdStream.identifyAlbumAsync();
+            failCount++;
+        } else {
+            failCount = 0;
+            Recognizer.this.notify(activity.getString(R.string.no_match));
+        }
     }
 }

@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 
 /**
  * Created by Alex on 12/17/15.
@@ -18,9 +19,19 @@ public class LastfmImageLoader extends AsyncTask<String, Void, byte[]> {
     private static String TAG = "LastFmImageLoader";
     @Override
     protected byte[] doInBackground(String... strings) {
-        return loadBinary(getImageUrl(loadUrl("http://ws.audioscrobbler.com/2.0/?method=artist.getInfo&artist="
-                + strings[0].replace("+", "%2B").replace(" ", "+") //artist name
-                + "&format=json&api_key=" + LAST_FM_KEY)));
+        return loadBinary(getImageUrl(loadUrl(buildUrl(strings[0]))));
+    }
+
+    private String buildUrl(String artist) {
+        try {
+            // Encode the artist name (to replace characters like &, " ", +, etc.)
+            artist = URLEncoder.encode(artist, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return "http://ws.audioscrobbler.com/2.0/?method=artist.getInfo&artist="
+                + artist //artist name
+                + "&format=json&api_key=" + LAST_FM_KEY;
     }
 
 

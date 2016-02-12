@@ -95,7 +95,6 @@ public class MainActivity extends AppCompatActivity implements LayoutCommunicato
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                searchLayout.reveal();
                 new Thread(recognizer).start();
             }
         });
@@ -116,8 +115,20 @@ public class MainActivity extends AppCompatActivity implements LayoutCommunicato
             }
 
             @Override
+            public void onStart() {
+                searchLayout.reveal();
+            }
+
+            @Override
             public void onResult(String title, String artist, String album) {
                 loadAndStart(title, artist, album);
+            }
+
+            @Override
+            public void onError(String error) {
+                recognizer.cancelId();
+                Toast.makeText(MainActivity.this, error, Toast.LENGTH_SHORT).show();
+                searchLayout.hide();
             }
         };
     }
@@ -230,7 +241,10 @@ public class MainActivity extends AppCompatActivity implements LayoutCommunicato
                 }
                 if(resultMap.size() > 0)
                     openSong(title, artist.name);
-                else recentFragment.refresh(); // if no chords for the song just refresh the list
+                else {
+                    recentFragment.refresh(); // if no chords for the song just refresh the list
+                    searchLayout.hide();
+                }
             }
         }.execute(artist.name, title);
     }
